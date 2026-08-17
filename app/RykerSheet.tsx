@@ -23,13 +23,34 @@ const assetPath = (name: string) => `${import.meta.env.BASE_URL}${name.replace(/
 
 function Resource({ label, value, max, tone, onChange }: ResourceProps) {
   const percent = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+  const step = max > 10 ? 5 : 1;
+
+  const setClampedValue = (nextValue: number) => {
+    if (Number.isFinite(nextValue)) {
+      onChange(Math.max(0, Math.min(max, Math.trunc(nextValue))));
+    }
+  };
+
   return (
     <article className={`resource ${tone}`} style={{ "--fill": `${percent}%` } as React.CSSProperties}>
       <span>{label}</span>
-      <div className="resource-number"><strong>{value}</strong><small>/ {max}</small></div>
+      <div className="resource-number">
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={max}
+          value={value}
+          aria-label={`Valor atual de ${label}`}
+          title="Clique para digitar o valor"
+          onFocus={(event) => event.currentTarget.select()}
+          onChange={(event) => setClampedValue(Number(event.currentTarget.value))}
+        />
+        <small>/ {max}</small>
+      </div>
       <div className="resource-actions">
-        <button type="button" onClick={() => onChange(Math.max(0, value - 1))} aria-label={`Diminuir ${label}`}>−</button>
-        <button type="button" onClick={() => onChange(Math.min(max, value + 1))} aria-label={`Aumentar ${label}`}>+</button>
+        <button type="button" onClick={() => setClampedValue(value - step)} aria-label={`Diminuir ${label} em ${step}`}>{step === 1 ? "−" : `−${step}`}</button>
+        <button type="button" onClick={() => setClampedValue(value + step)} aria-label={`Aumentar ${label} em ${step}`}>{step === 1 ? "+" : `+${step}`}</button>
       </div>
     </article>
   );
