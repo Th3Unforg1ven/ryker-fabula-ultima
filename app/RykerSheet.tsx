@@ -36,8 +36,8 @@ function Resource({ label, value, max, tone, onChange }: ResourceProps) {
 }
 
 export default function RykerSheet() {
-  const [hp, setHp] = useState(45);
-  const [mp, setMp] = useState(65);
+  const [hp, setHp] = useState(46);
+  const [mp, setMp] = useState(66);
   const [ip, setIp] = useState(6);
   const [fabula, setFabula] = useState(3);
   const [xp, setXp] = useState(6);
