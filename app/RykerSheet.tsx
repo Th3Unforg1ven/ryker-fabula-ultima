@@ -120,13 +120,14 @@ export default function RykerSheet() {
 
           <article className="inventory-ledger">
             <div className="inventory-title"><div><span>Mochila de campo</span><h3>Inventário</h3></div><strong>{ip}<small>/ 6 PI</small></strong></div>
-            <div className="inventory-head"><span>Item</span><span>Custo</span><span>Efeito</span></div>
+            <div className="inventory-head"><span>Item</span><span>Qtd./Custo</span><span>Efeito</span></div>
             <ul className="inventory-list">
               <li><span className="item-mark potion">✦</span><b>Elixir</b><em>3 PI</em><p>Recupera 50 PM</p></li>
               <li><span className="item-mark remedy">✚</span><b>Remédio</b><em>3 PI</em><p>Recupera 50 PV</p></li>
               <li><span className="item-mark tonic">◇</span><b>Tônico</b><em>2 PI</em><p>Remove todas as condições</p></li>
               <li><span className="item-mark shard">ϟ</span><b>Fragmento elemental</b><em>2 PI</em><p>Causa 10 de dano elemental</p></li>
               <li><span className="item-mark tent">⌂</span><b>Barraca mágica</b><em>4 PI</em><p>Permite descansar nos ermos</p></li>
+              <li><span className="item-mark holy">✧</span><b>Água Benta</b><em>×1</em><p>Item especial · efeito definido pelo Mestre</p></li>
             </ul>
             <div className="inventory-foot"><span>Itens de PI são criados e usados imediatamente.</span><b>Equipamento: 500z / 500z</b></div>
           </article>
