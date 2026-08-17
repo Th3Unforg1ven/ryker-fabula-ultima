@@ -104,11 +104,29 @@ export default function RykerSheet() {
 
       <section className="content-section loadout" id="equipamento">
         <div className="section-heading light"><div><p>Relíquias autorizadas</p><h2>Equipamento</h2></div><span className="zenit">2d6 × 10z <small>dinheiro inicial · 20–120z</small></span></div>
-        <div className="equipment-grid">
-          <article><span>Arma arcana rara · uma mão</span><h3>Tomo do Sol Negro</h3><p>Mecanicamente, uma Maça Abençoada.<br />Precisão <b>[VON + VON]</b><br />Dano <b>RA + 2 de luz</b></p><small>200 zenit · requer aprovação do grupo para item raro inicial</small></article>
-          <article><span>Armadura</span><h3>Vestes de Sábio</h3><p>DEF <b>DES + 1</b><br />Defesa Mágica <b>AST + 2</b><br />Iniciativa <b>−2</b></p><small>200 zenit</small></article>
-          <article><span>Escudo básico</span><h3>Mão do Confessor</h3><p>Mecanicamente, um Escudo de Bronze.<br />Defesa <b>+2</b></p><small>100 zenit · a máscara óssea usada como foco defensivo</small></article>
-          <article><span>Usos de Pontos de Inventário</span><h3>Inventário</h3><p><b>Elixir · 3 PI</b> — recupera 50 PM.<br /><b>Remédio · 3 PI</b> — recupera 50 PV.<br /><b>Tônico · 2 PI</b> — remove todas as condições.</p><small>São criados ao gastar PI e usados imediatamente; não custam zenit.</small></article>
+        <div className="equipment-shell">
+          <article className="paper-doll" aria-label="Equipamentos vestidos por Ryker">
+            <div className="gear-slot head empty"><span>Cabeça</span><b>—</b><small>vazio</small></div>
+            <div className="gear-slot main-hand"><span>Mão principal</span><b>Tomo do Sol Negro</b><small>VON + VON · RA + 2 luz</small></div>
+            <div className="character-token"><img src="/ryker.jpg" alt="Retrato de Ryker" /><span>Ryker</span><small>Equipado</small></div>
+            <div className="gear-slot off-hand"><span>Mão secundária</span><b>Mão do Confessor</b><small>Escudo · DEF +2</small></div>
+            <div className="gear-slot accessory"><span>Acessório</span><b>Rosário partido</b><small>relíquia narrativa</small></div>
+            <div className="gear-slot body"><span>Corpo</span><b>Vestes de Sábio</b><small>DEF +1 · Def.M +2 · Inic. −2</small></div>
+            <div className="gear-slot pack"><span>Mochila</span><b>Registros do Sol Negro</b><small>provas da purgação</small></div>
+          </article>
+
+          <article className="inventory-ledger">
+            <div className="inventory-title"><div><span>Mochila de campo</span><h3>Inventário</h3></div><strong>{ip}<small>/ 6 PI</small></strong></div>
+            <div className="inventory-head"><span>Item</span><span>Custo</span><span>Efeito</span></div>
+            <ul className="inventory-list">
+              <li><span className="item-mark potion">✦</span><b>Elixir</b><em>3 PI</em><p>Recupera 50 PM</p></li>
+              <li><span className="item-mark remedy">✚</span><b>Remédio</b><em>3 PI</em><p>Recupera 50 PV</p></li>
+              <li><span className="item-mark tonic">◇</span><b>Tônico</b><em>2 PI</em><p>Remove todas as condições</p></li>
+              <li><span className="item-mark shard">ϟ</span><b>Fragmento elemental</b><em>2 PI</em><p>Causa 10 de dano elemental</p></li>
+              <li><span className="item-mark tent">⌂</span><b>Barraca mágica</b><em>4 PI</em><p>Permite descansar nos ermos</p></li>
+            </ul>
+            <div className="inventory-foot"><span>Itens de PI são criados e usados imediatamente.</span><b>Equipamento: 500z / 500z</b></div>
+          </article>
         </div>
       </section>
 
