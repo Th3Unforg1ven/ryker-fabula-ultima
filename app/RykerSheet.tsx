@@ -19,6 +19,7 @@ const spells = [
 
 const attributes = [["DES", "Destreza", "d6"], ["AST", "Astúcia", "d8"], ["VIG", "Vigor", "d8"], ["VON", "Vontade", "d10"]];
 const conditions = ["Lento", "Furioso", "Atordoado", "Fraco", "Envenenado", "Abalado"];
+const assetPath = (name: string) => `${import.meta.env.BASE_URL}${name.replace(/^\//, "")}`;
 
 function Resource({ label, value, max, tone, onChange }: ResourceProps) {
   const percent = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
@@ -48,7 +49,7 @@ export default function RykerSheet() {
     <main>
       <header className="hero" id="topo">
         <div className="portrait-wrap">
-          <img className="portrait" src="/ryker.jpg" alt="Ryker com sua máscara ritual de marfim" />
+          <img className="portrait" src={assetPath("ryker.jpg")} alt="Ryker com sua máscara ritual de marfim" />
           <div className="portrait-index" aria-hidden="true"><span>†</span><b>V</b></div>
           <p className="portrait-caption">Ordem extinta · Registro de campo 05</p>
         </div>
@@ -108,7 +109,7 @@ export default function RykerSheet() {
           <article className="paper-doll" aria-label="Equipamentos vestidos por Ryker">
             <div className="gear-slot head empty"><span>Cabeça</span><b>—</b><small>vazio</small></div>
             <div className="gear-slot main-hand"><span>Mão principal</span><b>Tomo do Sol Negro</b><small>VON + VON · RA + 2 luz</small></div>
-            <div className="character-token"><img src="/ryker.jpg" alt="Retrato de Ryker" /><span>Ryker</span><small>Equipado</small></div>
+            <div className="character-token"><img src={assetPath("ryker.jpg")} alt="Retrato de Ryker" /><span>Ryker</span><small>Equipado</small></div>
             <div className="gear-slot off-hand"><span>Mão secundária</span><b>Mão do Confessor</b><small>Escudo · DEF +2</small></div>
             <div className="gear-slot accessory"><span>Acessório</span><b>Rosário partido</b><small>relíquia narrativa</small></div>
             <div className="gear-slot body"><span>Corpo</span><b>Vestes de Sábio</b><small>DEF +1 · Def.M +2 · Inic. −2</small></div>
