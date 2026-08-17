@@ -83,7 +83,7 @@ export default function RykerSheet() {
         </div>
         <div className="status-grid">
           <article className="attribute-panel"><p className="micro-label">Dados de atributo</p><div className="attributes">{attributes.map(([abbr, label, die]) => <div key={abbr}><span>{abbr}<small>{label}</small></span><strong>{die}</strong></div>)}</div></article>
-          <article className="defense-panel"><p className="micro-label">Defesas e limiar</p><div className="defenses"><div><span>Defesa</span><strong>7</strong></div><div><span>Def. Mágica</span><strong>10</strong></div><div><span>Iniciativa</span><strong>−2</strong></div><div className={hp <= 22 ? "crisis active" : "crisis"}><span>Crise</span><strong>22</strong></div></div></article>
+          <article className="defense-panel"><p className="micro-label">Defesas e limiar</p><div className="defenses"><div><span>Defesa</span><strong>9</strong></div><div><span>Def. Mágica</span><strong>10</strong></div><div><span>Iniciativa</span><strong>−2</strong></div><div className={hp <= 22 ? "crisis active" : "crisis"}><span>Crise</span><strong>22</strong></div></div></article>
           <article className="condition-panel"><p className="micro-label">Condições</p><div className="condition-list">{conditions.map((condition) => <button type="button" className={activeConditions.includes(condition) ? "active" : ""} onClick={() => toggleCondition(condition)} aria-pressed={activeConditions.includes(condition)} key={condition}>{condition}</button>)}</div></article>
         </div>
       </section>
@@ -91,7 +91,7 @@ export default function RykerSheet() {
       <section className="content-section" id="magias">
         <div className="section-heading"><div><p>Liturgia profana</p><h2>Grimório de campo</h2></div><span className="section-mark" aria-hidden="true">IV</span></div>
         <div className="spell-grid">{spells.map((spell) => <article className={`spell-card ${spell.color}`} key={spell.name}><div className="spell-sigil" aria-hidden="true">{spell.sigil}</div><div className="spell-top"><span>{spell.school}</span><b>{spell.cost}</b></div><h3>{spell.name}</h3><p className="spell-meta">{spell.target} · {spell.type}</p><p>{spell.effect}</p><small>{spell.note}</small></article>)}</div>
-        <p className="formula-note"><span>Teste ofensivo</span> [AST + VON] + 2 com o Tomo equipado</p>
+        <p className="formula-note"><span>Teste ofensivo</span> [AST + VON] + 2 com o Tomo do Sol Negro equipado</p>
       </section>
 
       <section className="content-section" id="classes">
@@ -103,11 +103,11 @@ export default function RykerSheet() {
       </section>
 
       <section className="content-section loadout" id="equipamento">
-        <div className="section-heading light"><div><p>Relíquias autorizadas</p><h2>Equipamento</h2></div><span className="zenit">50z <small>restantes</small></span></div>
+        <div className="section-heading light"><div><p>Relíquias autorizadas</p><h2>Equipamento</h2></div><span className="zenit">2d6 × 10z <small>dinheiro inicial · 20–120z</small></span></div>
         <div className="equipment-grid">
-          <article><span>Arma arcana · duas mãos</span><h3>Tomo</h3><p>Precisão <b>[AST + AST]</b><br />Dano <b>RA + 6 físico</b></p><small>100 zenit</small></article>
+          <article><span>Arma arcana rara · uma mão</span><h3>Tomo do Sol Negro</h3><p>Mecanicamente, uma Maça Abençoada.<br />Precisão <b>[VON + VON]</b><br />Dano <b>RA + 2 de luz</b></p><small>200 zenit · requer aprovação do grupo para item raro inicial</small></article>
           <article><span>Armadura</span><h3>Vestes de Sábio</h3><p>DEF <b>DES + 1</b><br />Defesa Mágica <b>AST + 2</b><br />Iniciativa <b>−2</b></p><small>200 zenit</small></article>
-          <article><span>Arma reserva · uma mão</span><h3>Faca do Réquiem</h3><p>Adaga de aço.<br />Precisão <b>[DES + AST] + 1</b><br />Dano <b>RA + 4 físico</b></p><small>150 zenit · guardada na mochila</small></article>
+          <article><span>Escudo básico</span><h3>Mão do Confessor</h3><p>Mecanicamente, um Escudo de Bronze.<br />Defesa <b>+2</b></p><small>100 zenit · a máscara óssea usada como foco defensivo</small></article>
           <article><span>Usos de Pontos de Inventário</span><h3>Inventário</h3><p><b>Elixir · 3 PI</b> — recupera 50 PM.<br /><b>Remédio · 3 PI</b> — recupera 50 PV.<br /><b>Tônico · 2 PI</b> — remove todas as condições.</p><small>São criados ao gastar PI e usados imediatamente; não custam zenit.</small></article>
         </div>
       </section>
@@ -123,7 +123,7 @@ export default function RykerSheet() {
             <article className="chapter"><span className="chapter-number">IV</span><div><h3>O exorcista errante</h3><p>Ryker viaja oferecendo seus ritos a vilas que sacerdotes abandonaram e enfrentando monstros que reconhecem nele um semelhante. Procura o mandante da destruição do mosteiro, possíveis sobreviventes e a verdade sobre o ritual interrompido em seu nascimento. Sua dúvida não é se possui uma parte monstruosa — isso ele já aceitou. É se pode continuar usando a fome como arma sem permitir que ela se torne sua identidade.</p></div></article>
           </div>
           <aside className="story-aside">
-            <div><p className="micro-label">Relíquias narrativas</p><dl className="relic-list"><dt>Mão do Confessor</dt><dd>Máscara de osso com olhos entalhados. Revela a contaminação espiritual e ajuda Ryker a conter a fome.</dd><dt>Rosário partido</dt><dd>Última lembrança de Madre Severine e do juramento feito entre as ruínas.</dd><dt>Tomo do Sol Negro</dt><dd>Arquivo dos ritos proibidos da ordem — e sua arma arcana de fato.</dd></dl><small>A máscara e o rosário não concedem bônus mecânicos sem aprovação do Mestre.</small></div>
+            <div><p className="micro-label">Relíquias</p><dl className="relic-list"><dt>Mão do Confessor</dt><dd>Máscara de osso com olhos entalhados. Revela a contaminação espiritual e funciona mecanicamente como um Escudo de Bronze.</dd><dt>Rosário partido</dt><dd>Última lembrança de Madre Severine e do juramento feito entre as ruínas; não concede bônus mecânicos.</dd><dt>Tomo do Sol Negro</dt><dd>Arquivo dos ritos proibidos da ordem e arma arcana de uma mão; usa as regras da Maça Abençoada.</dd></dl><small>Os nomes e a aparência foram alterados, mas as estatísticas seguem os equipamentos do livro.</small></div>
             <div className="goals"><p className="micro-label">Objetivos</p><ul><li>Descobrir quem ordenou a purgação.</li><li>Encontrar sobreviventes do mosteiro.</li><li>Impedir que os Falkenrath concluam o ritual.</li><li>Provar que sua fome pode servir à humanidade.</li></ul></div>
           </aside>
         </div>
