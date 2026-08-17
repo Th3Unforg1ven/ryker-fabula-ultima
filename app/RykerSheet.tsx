@@ -67,7 +67,7 @@ export default function RykerSheet() {
       </header>
 
       <nav className="section-nav" aria-label="Seções da ficha">
-        <a href="#estado">Estado</a><a href="#magias">Magias</a><a href="#doutrina">Doutrina</a><a href="#classes">Classes</a><a href="#equipamento">Equipamento</a><a href="#perfil">Perfil</a>
+        <a href="#estado">Estado</a><a href="#magias">Magias</a><a href="#classes">Classes</a><a href="#equipamento">Equipamento</a><a href="#historia">História</a><a href="#perfil">Perfil</a>
       </nav>
 
       <section className="state-panel" id="estado">
@@ -94,16 +94,6 @@ export default function RykerSheet() {
         <p className="formula-note"><span>Teste ofensivo</span> [AST + VON] + 2 com o Tomo equipado</p>
       </section>
 
-      <section className="content-section doctrine" id="doutrina">
-        <div className="section-heading light"><div><p>Protocolo de exorcismo</p><h2>Doutrina de combate</h2></div><span className="section-mark" aria-hidden="true">†</span></div>
-        <div className="turns">
-          <article><span>01</span><div><h3>Quebre o ritmo</h3><p>Lance <b>Aceleração</b> em Ryker. No fim do turno, use <b>Drenar Espírito</b> em um inimigo que possua PM.</p></div></article>
-          <article><span>02</span><div><h3>Escolha a sentença</h3><p><b>Raio</b> perfura Resistências contra um alvo prioritário. <b>Ignis</b> pune grupos e pode deixar todos Abalados.</p></div></article>
-          <article><span>03</span><div><h3>Alimente o selo</h3><p>O segundo efeito de Aceleração permite outro Drenar Espírito. Depois disso, preserve PM e repita apenas se a cena exigir.</p></div></article>
-        </div>
-        <aside><b>Se o alvo não tiver PM:</b> não desperdice Drenar Espírito. Use Ignis, Raio ou um ataque com o Tomo.</aside>
-      </section>
-
       <section className="content-section" id="classes">
         <div className="section-heading"><div><p>Disciplinas dominadas</p><h2>Classes e poderes</h2></div></div>
         <div className="class-grid">
@@ -113,8 +103,30 @@ export default function RykerSheet() {
       </section>
 
       <section className="content-section loadout" id="equipamento">
-        <div className="section-heading light"><div><p>Relíquias autorizadas</p><h2>Equipamento</h2></div><span className="zenit">200z <small>+ 2d6 × 10z</small></span></div>
-        <div className="equipment-grid"><article><span>Arma arcana · duas mãos</span><h3>Tomo</h3><p>Precisão <b>[AST + AST]</b><br />Dano <b>RA + 6 físico</b></p><small>100 zenit</small></article><article><span>Armadura</span><h3>Vestes de Sábio</h3><p>DEF <b>DES + 1</b><br />Defesa Mágica <b>AST + 2</b><br />Iniciativa <b>−2</b></p><small>200 zenit</small></article><article><span>Recuperação</span><h3>Elixir</h3><p>Gaste <b>3 PI</b> para recuperar <b>50 PM</b>.</p><small>Descanso restaura PV e PM por completo.</small></article></div>
+        <div className="section-heading light"><div><p>Relíquias autorizadas</p><h2>Equipamento</h2></div><span className="zenit">50z <small>restantes</small></span></div>
+        <div className="equipment-grid">
+          <article><span>Arma arcana · duas mãos</span><h3>Tomo</h3><p>Precisão <b>[AST + AST]</b><br />Dano <b>RA + 6 físico</b></p><small>100 zenit</small></article>
+          <article><span>Armadura</span><h3>Vestes de Sábio</h3><p>DEF <b>DES + 1</b><br />Defesa Mágica <b>AST + 2</b><br />Iniciativa <b>−2</b></p><small>200 zenit</small></article>
+          <article><span>Arma reserva · uma mão</span><h3>Faca do Réquiem</h3><p>Adaga de aço.<br />Precisão <b>[DES + AST] + 1</b><br />Dano <b>RA + 4 físico</b></p><small>150 zenit · guardada na mochila</small></article>
+          <article><span>Usos de Pontos de Inventário</span><h3>Inventário</h3><p><b>Elixir · 3 PI</b> — recupera 50 PM.<br /><b>Remédio · 3 PI</b> — recupera 50 PV.<br /><b>Tônico · 2 PI</b> — remove todas as condições.</p><small>São criados ao gastar PI e usados imediatamente; não custam zenit.</small></article>
+        </div>
+      </section>
+
+      <section className="content-section story" id="historia">
+        <div className="section-heading"><div><p>Confissão preservada em cinzas</p><h2>A história do Sol Negro</h2></div><span className="section-mark" aria-hidden="true">☉</span></div>
+        <div className="story-layout">
+          <div className="chapters">
+            <article className="story-intro"><p>Ryker Maximilian Severus von Falkenrath nasceu entre duas naturezas: herdeiro de uma linhagem vampírica da Estíria e filho de uma mulher humana que se recusou a entregá-lo à fome. A Casa Falkenrath não criava apenas predadores; buscava produzir um receptáculo capaz de consumir a essência sobrenatural de outras criaturas. Sua mãe fugiu antes que o ritual fosse concluído e confiou o menino ao único lugar que aceitou escondê-lo: o Mosteiro do Sol Negro.</p></article>
+            <article className="chapter"><span className="chapter-number">I</span><div><h3>O mosteiro dos condenados</h3><p>O Sol Negro era uma ordem clandestina de exorcistas que acolhia pessoas marcadas por maldições. Sob a tutela de <b>Madre Severine</b>, Ryker aprendeu que uma corrupção não precisa ser negada para ser combatida: ela pode ser nomeada, contida e voltada contra aquilo que a criou. O Elementalismo tornou-se sua chama purificadora; o Entropismo, o bisturi com que arrancava magia de demônios, mortos-vivos e feiticeiros.</p></div></article>
+            <article className="chapter"><span className="chapter-number">II</span><div><h3>A comunhão negra</h3><p>Para Ryker, <b>Drenar Espírito</b> não é apenas um feitiço. É a forma disciplinada de sua fome. Ele absorve a energia monstruosa, alimenta o selo que o mantém humano e devolve essa força como magia. Porém, cada essência consumida deixa um eco: lembranças, desejos e vozes que não lhe pertencem. Ryker teme que um dia não consiga distinguir sua consciência do coro dentro dele.</p></div></article>
+            <article className="chapter"><span className="chapter-number">III</span><div><h3>A noite do segundo crepúsculo</h3><p>O <b>Tribunal da Chama Branca</b> declarou o mosteiro herético e o reduziu a cinzas. Durante o massacre, Madre Severine quebrou o rosário que selava a aura de Ryker e o mandou fugir com o Tomo do Sol Negro e registros capazes de provar que a purgação teve motivos políticos. Ele sobreviveu; não sabe se mais alguém conseguiu. Desde então, é caçado tanto pela Igreja quanto pela Casa Falkenrath, que ainda o considera propriedade de sangue.</p></div></article>
+            <article className="chapter"><span className="chapter-number">IV</span><div><h3>O exorcista errante</h3><p>Ryker viaja oferecendo seus ritos a vilas que sacerdotes abandonaram e enfrentando monstros que reconhecem nele um semelhante. Procura o mandante da destruição do mosteiro, possíveis sobreviventes e a verdade sobre o ritual interrompido em seu nascimento. Sua dúvida não é se possui uma parte monstruosa — isso ele já aceitou. É se pode continuar usando a fome como arma sem permitir que ela se torne sua identidade.</p></div></article>
+          </div>
+          <aside className="story-aside">
+            <div><p className="micro-label">Relíquias narrativas</p><dl className="relic-list"><dt>Mão do Confessor</dt><dd>Máscara de osso com olhos entalhados. Revela a contaminação espiritual e ajuda Ryker a conter a fome.</dd><dt>Rosário partido</dt><dd>Última lembrança de Madre Severine e do juramento feito entre as ruínas.</dd><dt>Tomo do Sol Negro</dt><dd>Arquivo dos ritos proibidos da ordem — e sua arma arcana de fato.</dd></dl><small>A máscara e o rosário não concedem bônus mecânicos sem aprovação do Mestre.</small></div>
+            <div className="goals"><p className="micro-label">Objetivos</p><ul><li>Descobrir quem ordenou a purgação.</li><li>Encontrar sobreviventes do mosteiro.</li><li>Impedir que os Falkenrath concluam o ritual.</li><li>Provar que sua fome pode servir à humanidade.</li></ul></div>
+          </aside>
+        </div>
       </section>
 
       <section className="content-section profile" id="perfil">
