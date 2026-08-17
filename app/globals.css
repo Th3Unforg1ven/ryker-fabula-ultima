@@ -72,7 +72,7 @@ blockquote { margin: 0; max-width: 39rem; padding-left: 1.5rem; border-left: 1px
 .panel-actions button { padding: .7rem .9rem; border: 1px solid #5d483b55; background: transparent; color: #40322c; cursor: pointer; font: 700 .64rem Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 .panel-actions button:hover, .panel-actions button:focus-visible { background: #21171b; color: #fff; outline: none; }
 
-.resources { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #4a392f44; }
+.resources { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid #4a392f44; }
 .resource { --accent: #803149; position: relative; min-width: 0; padding: 1.15rem 1.15rem 1rem; border-right: 1px solid #4a392f44; overflow: hidden; }
 .resource:last-child { border-right: 0; }
 .resource::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, var(--accent) var(--fill), #2b211f22 var(--fill)); }
@@ -191,8 +191,8 @@ footer a { color: var(--gold); text-decoration: none; }
   .hero { grid-template-columns: .9fr 1.1fr; }
   .hero-copy { padding: 3rem; }
   .resources, .spell-grid { grid-template-columns: repeat(2, 1fr); }
-  .resource:nth-child(2) { border-right: 0; }
-  .resource:nth-child(-n+2) { border-bottom: 1px solid #4a392f44; }
+  .resource:nth-child(even) { border-right: 0; }
+  .resource:nth-child(-n+4) { border-bottom: 1px solid #4a392f44; }
   .status-grid { grid-template-columns: 1fr 1fr; }.condition-panel { grid-column: 1 / -1; }
   .equipment-shell { grid-template-columns: 1fr; }
   .story-layout { grid-template-columns: 1fr; }

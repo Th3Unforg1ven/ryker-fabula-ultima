@@ -40,9 +40,10 @@ export default function RykerSheet() {
   const [mp, setMp] = useState(65);
   const [ip, setIp] = useState(6);
   const [fabula, setFabula] = useState(3);
+  const [xp, setXp] = useState(6);
   const [activeConditions, setActiveConditions] = useState<string[]>([]);
 
-  const reset = () => { setHp(45); setMp(65); setIp(6); setFabula(3); setActiveConditions([]); };
+  const reset = () => { setHp(46); setMp(66); setIp(6); setFabula(3); setActiveConditions([]); };
   const toggleCondition = (condition: string) => setActiveConditions((current) => current.includes(condition) ? current.filter((item) => item !== condition) : [...current, condition]);
 
   return (
@@ -50,19 +51,19 @@ export default function RykerSheet() {
       <header className="hero" id="topo">
         <div className="portrait-wrap">
           <img className="portrait" src={assetPath("ryker.jpg")} alt="Ryker com sua máscara ritual de marfim" />
-          <div className="portrait-index" aria-hidden="true"><span>†</span><b>V</b></div>
+          <div className="portrait-index" aria-hidden="true"><span>†</span><b>VI</b></div>
           <p className="portrait-caption">Ordem extinta · Registro de campo 05</p>
         </div>
         <div className="hero-copy">
           <p className="eyebrow">Arquivo do Mosteiro do Sol Negro · Sigilo quebrado</p>
           <h1>Ryker <em>Maximilian Severus von Falkenrath</em></h1>
-          <p className="title">Dhampir · Exorcista · Elementalista III / Entropista II</p>
+          <p className="title">Dhampir · Exorcista · Elementalista IV / Entropista II</p>
           <blockquote>“Eu devoro a magia dos monstros para não me tornar um deles.”</blockquote>
           <div className="identity-grid">
             <div><span>Identidade</span><b>Exorcista que devora magia monstruosa para continuar humano.</b></div>
             <div><span>Tema</span><b>Dúvida</b></div>
             <div><span>Origem</span><b>Mosteiro do Sol Negro</b></div>
-            <div><span>Nível</span><b>5</b></div>
+            <div><span>Nível</span><b>6</b></div>
           </div>
         </div>
       </header>
@@ -77,14 +78,15 @@ export default function RykerSheet() {
           <div className="panel-actions"><button type="button" onClick={reset}>Restaurar ficha</button><button type="button" onClick={() => window.print()}>Imprimir</button></div>
         </div>
         <div className="resources">
-          <Resource label="Pontos de Vida" value={hp} max={45} tone="blood" onChange={setHp} />
-          <Resource label="Pontos de Mente" value={mp} max={65} tone="mana" onChange={setMp} />
+          <Resource label="Pontos de Vida" value={hp} max={46} tone="blood" onChange={setHp} />
+          <Resource label="Pontos de Mente" value={mp} max={66} tone="mana" onChange={setMp} />
           <Resource label="Inventário" value={ip} max={6} tone="ink" onChange={setIp} />
           <Resource label="Pontos de Fábula" value={fabula} max={5} tone="gold" onChange={setFabula} />
+          <Resource label="Experiência" value={xp} max={10} tone="gold" onChange={setXp} />
         </div>
         <div className="status-grid">
           <article className="attribute-panel"><p className="micro-label">Dados de atributo</p><div className="attributes">{attributes.map(([abbr, label, die]) => <div key={abbr}><span>{abbr}<small>{label}</small></span><strong>{die}</strong></div>)}</div></article>
-          <article className="defense-panel"><p className="micro-label">Defesas e limiar</p><div className="defenses"><div><span>Defesa</span><strong>9</strong></div><div><span>Def. Mágica</span><strong>10</strong></div><div><span>Iniciativa</span><strong>−2</strong></div><div className={hp <= 22 ? "crisis active" : "crisis"}><span>Crise</span><strong>22</strong></div></div></article>
+          <article className="defense-panel"><p className="micro-label">Defesas e limiar</p><div className="defenses"><div><span>Defesa</span><strong>9</strong></div><div><span>Def. Mágica</span><strong>10</strong></div><div><span>Iniciativa</span><strong>−2</strong></div><div className={hp <= 23 ? "crisis active" : "crisis"}><span>Crise</span><strong>23</strong></div></div></article>
           <article className="condition-panel"><p className="micro-label">Condições</p><div className="condition-list">{conditions.map((condition) => <button type="button" className={activeConditions.includes(condition) ? "active" : ""} onClick={() => toggleCondition(condition)} aria-pressed={activeConditions.includes(condition)} key={condition}>{condition}</button>)}</div></article>
         </div>
       </section>
@@ -92,13 +94,13 @@ export default function RykerSheet() {
       <section className="content-section" id="magias">
         <div className="section-heading"><div><p>Liturgia profana</p><h2>Grimório de campo</h2></div><span className="section-mark" aria-hidden="true">IV</span></div>
         <div className="spell-grid">{spells.map((spell) => <article className={`spell-card ${spell.color}`} key={spell.name}><div className="spell-sigil" aria-hidden="true">{spell.sigil}</div><div className="spell-top"><span>{spell.school}</span><b>{spell.cost}</b></div><h3>{spell.name}</h3><p className="spell-meta">{spell.target} · {spell.type}</p><p>{spell.effect}</p><small>{spell.note}</small></article>)}</div>
-        <p className="formula-note"><span>Teste ofensivo</span> [AST + VON] + 2 com o Tomo do Sol Negro equipado</p>
+        <p className="formula-note"><span>Teste ofensivo</span> [AST + VON] + 4 com o Tomo do Sol Negro equipado</p>
       </section>
 
       <section className="content-section" id="classes">
         <div className="section-heading"><div><p>Disciplinas dominadas</p><h2>Classes e poderes</h2></div></div>
         <div className="class-grid">
-          <article><span className="level">Nível 3</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental II</b> — aprende Ignis e Raio.</li><li><b>Artilharia Mágica I</b> — +2 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e rituais de Elementalismo.</li></ul></article>
+          <article><span className="level">Nível 4</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental II</b> — aprende Ignis e Raio.</li><li><b>Artilharia Mágica II</b> — +4 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e rituais de Elementalismo.</li></ul></article>
           <article><span className="level">Nível 2</span><p className="micro-label">Entropista</p><h3>A fome entre instantes</h3><ul><li><b>Magia Entrópica II</b> — aprende Aceleração e Drenar Espírito.</li><li><b>Benefício</b> — +5 PM e rituais de Entropismo.</li><li><b>Função</b> — economia de ações e autossustentação de PM.</li></ul></article>
         </div>
       </section>
