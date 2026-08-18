@@ -111,7 +111,7 @@ blockquote { margin: 0; max-width: 39rem; padding-left: 1.5rem; border-left: 1px
 .spell-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
 .spell-card { --spell: #b65b3d; position: relative; min-height: 23rem; padding: 1.3rem; border: 1px solid #ffffff17; background: linear-gradient(145deg, #241a21, #171117); overflow: hidden; }
 .spell-card::after { content: ""; position: absolute; right: -7rem; bottom: -7rem; width: 15rem; height: 15rem; border: 1px solid color-mix(in srgb, var(--spell) 35%, transparent); border-radius: 50%; box-shadow: 0 0 0 2rem #ffffff05, 0 0 0 4rem #ffffff03; }
-.spell-card.storm { --spell: #6b9db3; }.spell-card.time { --spell: #b78c56; }.spell-card.void { --spell: #9a577b; }
+.spell-card.storm { --spell: #6b9db3; }.spell-card.frost { --spell: #9ccbd5; }.spell-card.time { --spell: #b78c56; }.spell-card.void { --spell: #9a577b; }.spell-card.ward { --spell: #d0b66c; }
 .spell-sigil { position: relative; z-index: 1; color: var(--spell); font-size: 2.6rem; line-height: 1; }
 .spell-top { margin-top: 2.2rem; display: flex; justify-content: space-between; color: var(--gold); font: 700 .61rem Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; }
 .spell-card h3 { margin: .7rem 0 .35rem; font-size: 2rem; font-weight: 500; }
@@ -121,7 +121,7 @@ blockquote { margin: 0; max-width: 39rem; padding-left: 1.5rem; border-left: 1px
 .formula-note { margin-top: 1rem; padding: 1rem; border: 1px solid var(--line); color: #cfc0ad; font: .78rem Arial, sans-serif; text-align: center; }
 .formula-note span { color: var(--gold); margin-right: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
 
-.class-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.class-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .class-grid article { position: relative; min-height: 23rem; padding: 2rem; border: 1px solid var(--line); background: #1c151a; }
 .class-grid article::before { content: ""; position: absolute; inset: .5rem; border: 1px solid #ffffff09; pointer-events: none; }
 .class-grid .level { float: right; color: var(--gold); font: 700 .65rem Arial, sans-serif; letter-spacing: .13em; text-transform: uppercase; }
@@ -192,7 +192,7 @@ footer a { color: var(--gold); text-decoration: none; }
 @media (max-width: 1080px) {
   .hero { grid-template-columns: .9fr 1.1fr; }
   .hero-copy { padding: 3rem; }
-  .resources, .spell-grid { grid-template-columns: repeat(2, 1fr); }
+  .resources, .spell-grid, .class-grid { grid-template-columns: repeat(2, 1fr); }
   .resource:nth-child(even) { border-right: 0; }
   .resource:nth-child(-n+4) { border-bottom: 1px solid #4a392f44; }
   .status-grid { grid-template-columns: 1fr 1fr; }.condition-panel { grid-column: 1 / -1; }
