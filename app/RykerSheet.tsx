@@ -10,20 +10,46 @@ type ResourceProps = {
   onChange: (value: number) => void;
 };
 
-const spells = [
-  { name: "Ignis", school: "Elementalismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de fogo a cada alvo atingido.", note: "Oportunidade: cada alvo atingido fica Abalado.", sigil: "✹", color: "ember" },
-  { name: "Raio", school: "Elementalismo", cost: "20 PM", target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "Causa RA + 25 de dano de raio.", note: "O dano ignora Resistências.", sigil: "ϟ", color: "storm" },
-  { name: "Glacies", school: "Elementalismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de gelo a cada alvo atingido.", note: "Oportunidade: cada alvo atingido também fica Lento.", sigil: "❄", color: "frost" },
-  { name: "Aceleração", school: "Entropismo", cost: "20 PM", target: "Uma criatura", type: "Duração: Cena", effect: "No fim do turno, o alvo faz um ataque livre ou lança um feitiço de até 10 PM sem gastar uma ação.", note: "Termina depois que o mesmo alvo usa o efeito duas vezes.", sigil: "⌛", color: "time" },
-  { name: "Drenar Espírito", school: "Entropismo", cost: "5 PM", target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "O alvo perde RA + 20 PM. Ryker recupera metade dos PM perdidos.", note: "Sem PM no alvo, não há recuperação.", sigil: "◉", color: "void" },
-  { name: "Curar", school: "Espiritualismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Suporte · Instantâneo", effect: "Cada alvo recupera 40 Pontos de Vida.", note: "Com Aceleração, pode curar um alvo por 10 PM sem gastar uma ação.", sigil: "✦", color: "ward" },
+type Spell = {
+  name: string;
+  school: string;
+  cost: string;
+  costPerTarget: number;
+  maxTargets: number;
+  target: string;
+  type: string;
+  effect: string;
+  note: string;
+  sigil: string;
+  color: string;
+  offensive: boolean;
+  resultKind?: "damage" | "drain";
+  resultBonus?: number;
+  resultType?: string;
+};
+
+type InventoryItem = { id: string; name: string; quantity: number; note: string };
+type RollResult = { title: string; dice?: [number, number]; total?: number; high?: number; outcome: string; detail: string };
+
+const spells: Spell[] = [
+  { name: "Ignis", school: "Elementalismo", cost: "10 × A PM", costPerTarget: 10, maxTargets: 3, target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de fogo a cada alvo atingido.", note: "Oportunidade: cada alvo atingido fica Abalado.", sigil: "✹", color: "ember", offensive: true, resultKind: "damage", resultBonus: 15, resultType: "fogo" },
+  { name: "Raio", school: "Elementalismo", cost: "20 PM", costPerTarget: 20, maxTargets: 1, target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "Causa RA + 25 de dano de raio.", note: "O dano ignora Resistências, mas não Imunidade ou Absorção.", sigil: "ϟ", color: "storm", offensive: true, resultKind: "damage", resultBonus: 25, resultType: "raio" },
+  { name: "Glacies", school: "Elementalismo", cost: "10 × A PM", costPerTarget: 10, maxTargets: 3, target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de gelo a cada alvo atingido.", note: "Oportunidade: cada alvo atingido também fica Lento.", sigil: "❄", color: "frost", offensive: true, resultKind: "damage", resultBonus: 15, resultType: "gelo" },
+  { name: "Aceleração", school: "Entropismo", cost: "20 PM", costPerTarget: 20, maxTargets: 1, target: "Uma criatura", type: "Duração: Cena", effect: "No fim de cada turno de Ryker, o alvo faz um ataque livre ou lança um feitiço de até 10 PM sem gastar uma ação.", note: "Termina depois que o mesmo alvo usa o efeito duas vezes.", sigil: "⌛", color: "time", offensive: false },
+  { name: "Drenar Espírito", school: "Entropismo", cost: "5 PM", costPerTarget: 5, maxTargets: 1, target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "O alvo perde RA + 20 PM. Ryker recupera metade dos PM realmente perdidos.", note: "Sem PM no alvo, não há recuperação.", sigil: "◉", color: "void", offensive: true, resultKind: "drain", resultBonus: 20 },
+  { name: "Curar", school: "Espiritualismo", cost: "10 × A PM", costPerTarget: 10, maxTargets: 3, target: "Até 3 criaturas", type: "Suporte · Instantâneo", effect: "Cada alvo recupera 40 Pontos de Vida.", note: "Com Aceleração, pode curar um alvo por 10 PM sem gastar uma ação.", sigil: "✦", color: "ward", offensive: false },
 ];
 
 const attributes = [["DES", "Destreza", "d6"], ["AST", "Astúcia", "d8"], ["VIG", "Vigor", "d8"], ["VON", "Vontade", "d10"]];
-const conditions = ["Lento", "Furioso", "Atordoado", "Fraco", "Envenenado", "Abalado"];
+const conditions = ["Lento", "Enfurecido", "Atordoado", "Fraco", "Envenenado", "Abalado"];
 const assetPath = (name: string) => `${import.meta.env.BASE_URL}${name.replace(/^\//, "")}`;
 const storageKey = "ryker-sheet-state-v1";
-const initialState = { hp: 48, mp: 73, ip: 6, fabula: 3, xp: 6, activeConditions: [] as string[] };
+const defaultInventory: InventoryItem[] = [
+  { id: "agua-benta", name: "Água Benta", quantity: 1, note: "Item especial · efeito definido pelo Mestre" },
+];
+const initialState = { hp: 48, mp: 73, ip: 6, fabula: 3, xp: 6, activeConditions: [] as string[], inventoryItems: defaultInventory };
+const diceSizes = [6, 8, 10, 12];
+const rollDie = (size: number) => Math.floor(Math.random() * size) + 1;
 
 const savedNumber = (value: unknown, fallback: number, maximum: number) =>
   typeof value === "number" && Number.isFinite(value)
@@ -72,8 +98,21 @@ export default function RykerSheet() {
   const [fabula, setFabula] = useState(initialState.fabula);
   const [xp, setXp] = useState(initialState.xp);
   const [activeConditions, setActiveConditions] = useState<string[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(defaultInventory);
+  const [newItemName, setNewItemName] = useState("");
+  const [newItemQuantity, setNewItemQuantity] = useState(1);
+  const [newItemNote, setNewItemNote] = useState("");
+  const [spellTargets, setSpellTargets] = useState<Record<string, number>>({ Ignis: 1, Glacies: 1, Curar: 1 });
+  const [targetMagicDefense, setTargetMagicDefense] = useState(10);
+  const [spellRoll, setSpellRoll] = useState<RollResult | null>(null);
+  const [testDieA, setTestDieA] = useState(8);
+  const [testDieB, setTestDieB] = useState(8);
+  const [testModifier, setTestModifier] = useState(0);
+  const [testDifficulty, setTestDifficulty] = useState(10);
+  const [testRoll, setTestRoll] = useState<RollResult | null>(null);
   const [storageReady, setStorageReady] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- hydration from browser-local saved state */
   useEffect(() => {
     try {
       const storedState = window.localStorage.getItem(storageKey);
@@ -85,8 +124,23 @@ export default function RykerSheet() {
         setFabula(savedNumber(saved.fabula, initialState.fabula, 5));
         setXp(savedNumber(saved.xp, initialState.xp, 10));
         setActiveConditions(Array.isArray(saved.activeConditions)
-          ? saved.activeConditions.filter((condition): condition is string => typeof condition === "string" && conditions.includes(condition))
+          ? saved.activeConditions
+            .map((condition) => condition === "Furioso" ? "Enfurecido" : condition)
+            .filter((condition): condition is string => typeof condition === "string" && conditions.includes(condition))
           : initialState.activeConditions);
+        setInventoryItems(Array.isArray(saved.inventoryItems)
+          ? saved.inventoryItems.flatMap((item) => {
+            if (!item || typeof item !== "object") return [];
+            const candidate = item as Record<string, unknown>;
+            if (typeof candidate.id !== "string" || typeof candidate.name !== "string" || !candidate.name.trim()) return [];
+            return [{
+              id: candidate.id,
+              name: candidate.name.trim().slice(0, 60),
+              quantity: Math.max(1, savedNumber(candidate.quantity, 1, 99)),
+              note: typeof candidate.note === "string" ? candidate.note.trim().slice(0, 140) : "",
+            }];
+          })
+          : initialState.inventoryItems);
       }
     } catch {
       window.localStorage.removeItem(storageKey);
@@ -94,11 +148,12 @@ export default function RykerSheet() {
       setStorageReady(true);
     }
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!storageReady) return;
-    window.localStorage.setItem(storageKey, JSON.stringify({ hp, mp, ip, fabula, xp, activeConditions }));
-  }, [storageReady, hp, mp, ip, fabula, xp, activeConditions]);
+    window.localStorage.setItem(storageKey, JSON.stringify({ hp, mp, ip, fabula, xp, activeConditions, inventoryItems }));
+  }, [storageReady, hp, mp, ip, fabula, xp, activeConditions, inventoryItems]);
 
   const reset = () => {
     setHp(initialState.hp);
@@ -107,8 +162,86 @@ export default function RykerSheet() {
     setFabula(initialState.fabula);
     setXp(initialState.xp);
     setActiveConditions(initialState.activeConditions);
+    setInventoryItems(initialState.inventoryItems);
   };
   const toggleCondition = (condition: string) => setActiveConditions((current) => current.includes(condition) ? current.filter((item) => item !== condition) : [...current, condition]);
+
+  const addInventoryItem = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const name = newItemName.trim();
+    if (!name) return;
+    const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+    setInventoryItems((current) => [...current, { id, name: name.slice(0, 60), quantity: Math.max(1, Math.min(99, newItemQuantity)), note: newItemNote.trim().slice(0, 140) }]);
+    setNewItemName("");
+    setNewItemQuantity(1);
+    setNewItemNote("");
+  };
+
+  const changeItemQuantity = (id: string, nextQuantity: number) => {
+    if (nextQuantity < 1) return;
+    setInventoryItems((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.min(99, nextQuantity) } : item));
+  };
+
+  const getRollStatus = (first: number, second: number, total: number, difficulty: number) => {
+    const fumble = first === 1 && second === 1;
+    const critical = first === second && first >= 6;
+    return { fumble, critical, success: !fumble && (critical || total >= difficulty) };
+  };
+
+  const rollSpell = (spell: Spell) => {
+    const targets = spellTargets[spell.name] ?? 1;
+    const totalCost = spell.costPerTarget * targets;
+    if (!spell.offensive) {
+      setSpellRoll({ title: spell.name, outcome: "Sucesso automático", detail: `Sem teste de Magia. Custo total: ${totalCost} PM para ${targets} alvo${targets > 1 ? "s" : ""}. ${spell.effect}` });
+      return;
+    }
+
+    const ast = rollDie(8);
+    const will = rollDie(10);
+    const total = ast + will + 4;
+    const high = Math.max(ast, will);
+    const { fumble, critical, success } = getRollStatus(ast, will, total, targetMagicDefense);
+    let detail = `Custo: ${totalCost} PM. `;
+    if (fumble) {
+      detail += "Falha crítica: não afeta o alvo, Ryker ganha 1 Ponto de Fábula e o Mestre recebe uma Oportunidade.";
+    } else if (!success) {
+      detail += `Falhou contra Def. Mágica ${targetMagicDefense}.`;
+    } else if (spell.resultKind === "damage") {
+      detail += `${high + (spell.resultBonus ?? 0)} de dano bruto de ${spell.resultType} em cada alvo atingido.`;
+    } else {
+      const drained = high + (spell.resultBonus ?? 0);
+      detail += `O alvo perde até ${drained} PM; Ryker recupera metade dos PM realmente perdidos, arredondada para baixo.`;
+    }
+    if (critical) detail += spell.note.startsWith("Oportunidade:")
+      ? ` Crítico: acerto automático e uma Oportunidade; você pode usar o efeito especial de ${spell.name} ou uma opção geral.`
+      : " Crítico: acerto automático e uma Oportunidade geral.";
+    if (targets > 1) detail += ` O mesmo total ${total} é comparado à Def. Mágica de cada um dos ${targets} alvos.`;
+    setSpellRoll({ title: spell.name, dice: [ast, will], total, high, outcome: fumble ? "Falha crítica" : critical ? "Sucesso crítico" : success ? "Acertou" : "Falhou", detail });
+  };
+
+  const rollGenericTest = () => {
+    const first = rollDie(testDieA);
+    const second = rollDie(testDieB);
+    const total = first + second + testModifier;
+    const high = Math.max(first, second);
+    const { fumble, critical, success } = getRollStatus(first, second, total, testDifficulty);
+    setTestRoll({
+      title: "Teste geral",
+      dice: [first, second],
+      total,
+      high,
+      outcome: fumble ? "Falha crítica" : critical ? "Sucesso crítico" : success ? "Sucesso" : "Falha",
+      detail: fumble ? "Ganhe 1 Ponto de Fábula; a oposição recebe uma Oportunidade." : critical ? "Sucesso automático e você recebe uma Oportunidade." : success ? `O total igualou ou superou o ND ${testDifficulty}.` : `O total ficou abaixo do ND ${testDifficulty}.`,
+    });
+  };
+
+  const setTestPreset = (first: number, second: number, modifier: number, difficulty: number) => {
+    setTestDieA(first);
+    setTestDieB(second);
+    setTestModifier(modifier);
+    setTestDifficulty(difficulty);
+    setTestRoll(null);
+  };
 
   return (
     <main>
@@ -133,7 +266,7 @@ export default function RykerSheet() {
       </header>
 
       <nav className="section-nav" aria-label="Seções da ficha">
-        <a href="#estado">Estado</a><a href="#magias">Magias</a><a href="#classes">Classes</a><a href="#equipamento">Equipamento</a><a href="#historia">História</a><a href="#perfil">Perfil</a>
+        <a href="#estado">Estado</a><a href="#magias">Magias</a><a href="#manual">Manual</a><a href="#classes">Classes</a><a href="#equipamento">Equipamento</a><a href="#historia">História</a><a href="#perfil">Perfil</a>
       </nav>
 
       <section className="state-panel" id="estado">
@@ -157,8 +290,59 @@ export default function RykerSheet() {
 
       <section className="content-section" id="magias">
         <div className="section-heading"><div><p>Liturgia profana</p><h2>Grimório de campo</h2></div><span className="section-mark" aria-hidden="true">VI</span></div>
-        <div className="spell-grid">{spells.map((spell) => <article className={`spell-card ${spell.color}`} key={spell.name}><div className="spell-sigil" aria-hidden="true">{spell.sigil}</div><div className="spell-top"><span>{spell.school}</span><b>{spell.cost}</b></div><h3>{spell.name}</h3><p className="spell-meta">{spell.target} · {spell.type}</p><p>{spell.effect}</p><small>{spell.note}</small></article>)}</div>
-        <p className="formula-note"><span>Teste ofensivo</span> [AST + VON] + 4 com o Tomo do Sol Negro equipado</p>
+        <div className="spell-console">
+          <div><span>Defesa Mágica do alvo</span><input type="number" min={1} max={30} value={targetMagicDefense} onChange={(event) => setTargetMagicDefense(Math.max(1, Math.min(30, Number(event.currentTarget.value) || 1)))} /></div>
+          <p><b>Ofensivas:</b> d8 AST + d10 VON + 4. O mesmo resultado vale para todos os alvos.</p>
+          <small>Os botões fazem a rolagem e calculam RA, acerto, efeito e custo. Eles não descontam PM automaticamente.</small>
+        </div>
+        {spellRoll && <aside className="roll-result" aria-live="polite">
+          <div><span>Última invocação</span><h3>{spellRoll.title}</h3></div>
+          {spellRoll.dice && <div className="rolled-dice"><i>d8<strong>{spellRoll.dice[0]}</strong></i><b>+</b><i>d10<strong>{spellRoll.dice[1]}</strong></i><b>+ 4</b></div>}
+          <div className="roll-verdict"><strong>{spellRoll.outcome}</strong>{spellRoll.total !== undefined && <span>Total {spellRoll.total} · RA {spellRoll.high}</span>}</div>
+          <p>{spellRoll.detail}</p>
+        </aside>}
+        <div className="spell-grid">{spells.map((spell) => {
+          const targetCount = spellTargets[spell.name] ?? 1;
+          return <article className={`spell-card ${spell.color}`} key={spell.name}>
+            <div className="spell-sigil" aria-hidden="true">{spell.sigil}</div><div className="spell-top"><span>{spell.school}</span><b>{spell.cost}</b></div>
+            <h3>{spell.name}</h3><p className="spell-meta">{spell.target} · {spell.type}</p><p>{spell.effect}</p><small>{spell.note}</small>
+            <div className="spell-roll-controls">
+              {spell.maxTargets > 1 && <label>Alvos<select value={targetCount} onChange={(event) => setSpellTargets((current) => ({ ...current, [spell.name]: Number(event.currentTarget.value) }))}>{[1, 2, 3].map((amount) => <option value={amount} key={amount}>{amount}</option>)}</select></label>}
+              <button type="button" onClick={() => rollSpell(spell)}>{spell.offensive ? "Rolar magia" : "Calcular efeito"}</button>
+            </div>
+            <p className="spell-formula">{spell.offensive ? "d8 + d10 + 4 vs Def. Mágica" : "Sem teste · sucesso automático"}</p>
+          </article>;
+        })}</div>
+        <p className="formula-note"><span>Importante</span> crítico é par de 6 ou mais; ele acerta automaticamente e gera uma Oportunidade, mas não dobra o dano.</p>
+      </section>
+
+      <section className="content-section quick-reference" id="manual">
+        <div className="section-heading"><div><p>Folha de consulta</p><h2>Manual rápido de mesa</h2></div><span className="section-mark" aria-hidden="true">✦</span></div>
+        <div className="test-console">
+          <div className="test-console-copy"><p className="micro-label">Rolador universal</p><h3>Dois dados, um resultado</h3><p>Monte qualquer teste de Fabula Ultima. A RA é sempre o maior valor natural entre os dois dados.</p><div className="test-presets"><button type="button" onClick={() => setTestPreset(8, 10, 4, 10)}>Magia de Ryker</button><button type="button" onClick={() => setTestPreset(8, 8, 0, 10)}>Estudo</button><button type="button" onClick={() => setTestPreset(6, 8, -2, 10)}>Iniciativa</button></div></div>
+          <div className="test-builder">
+            <label>Dado 1<select value={testDieA} onChange={(event) => setTestDieA(Number(event.currentTarget.value))}>{diceSizes.map((size) => <option value={size} key={size}>d{size}</option>)}</select></label>
+            <span>+</span>
+            <label>Dado 2<select value={testDieB} onChange={(event) => setTestDieB(Number(event.currentTarget.value))}>{diceSizes.map((size) => <option value={size} key={size}>d{size}</option>)}</select></label>
+            <span>+</span>
+            <label>Mod.<input type="number" min={-10} max={20} value={testModifier} onChange={(event) => setTestModifier(Number(event.currentTarget.value) || 0)} /></label>
+            <label>ND<input type="number" min={1} max={30} value={testDifficulty} onChange={(event) => setTestDifficulty(Math.max(1, Number(event.currentTarget.value) || 1))} /></label>
+            <button type="button" onClick={rollGenericTest}>Rolar teste</button>
+          </div>
+          {testRoll && <div className="generic-result" aria-live="polite"><div className="rolled-dice"><i>d{testDieA}<strong>{testRoll.dice?.[0]}</strong></i><b>+</b><i>d{testDieB}<strong>{testRoll.dice?.[1]}</strong></i>{testModifier !== 0 && <b>{testModifier > 0 ? `+ ${testModifier}` : `− ${Math.abs(testModifier)}`}</b>}</div><div><strong>{testRoll.outcome}</strong><span>Total {testRoll.total} · RA {testRoll.high}</span><p>{testRoll.detail}</p></div></div>}
+        </div>
+        <div className="reference-grid">
+          <details open><summary>Teste comum e dificuldades</summary><p>Role exatamente dois dados de Atributo, some os resultados e modificadores. Se o total alcançar o ND, passou.</p><ul><li>ND 7: básico</li><li>ND 10: competente</li><li>ND 13: especialista</li><li>ND 16: lendário</li><li>Situação favorável ou desfavorável: normalmente ±2</li></ul></details>
+          <details open><summary>Crítico, falha crítica e RA</summary><p><b>RA</b> é o maior dos dois dados. <b>Crítico</b>: dados iguais e ambos 6 ou mais; sucesso automático e uma Oportunidade. <b>Falha crítica</b>: dois resultados 1; falha automática, a oposição ganha uma Oportunidade e Ryker recebe 1 PF.</p></details>
+          <details open><summary>Magia em seis passos</summary><ol><li>Escolha feitiço e efeito.</li><li>Escolha alvos visíveis.</li><li>Confirme que pode falar e mover os braços.</li><li>Pague o custo total de PM.</li><li>Se for ofensivo, role d8 + d10 + 4 contra Def.M; suporte não rola.</li><li>Aplique RA, dano, cura ou condição.</li></ol></details>
+          <details open><summary>Afinidades e dano</summary><ul><li>Vulnerável: perde o dobro de PV.</li><li>Resistente: perde metade dos PV.</li><li>Imune: perde 0 PV.</li><li>Absorvedor: recupera PV em vez de perder.</li></ul><p><b>Raio</b> ignora apenas Resistência. Imunidade e Absorção continuam valendo.</p></details>
+          <details open><summary>Ações que ganham combates</summary><ul><li><b>Estudo:</b> teste aberto, geralmente AST + AST. Descubra Vulnerabilidades antes de gastar PM.</li><li><b>Guarda:</b> fica Resistente a todo dano até seu próximo turno, ganha +2 em testes opostos e pode cobrir um aliado contra ataques corpo a corpo.</li><li><b>Impedimento:</b> teste ND 10; em sucesso, cause Abalado, Atordoado, Fraco ou Lento.</li><li><b>Inventário:</b> gaste PI para criar e usar um consumível imediatamente.</li></ul></details>
+          <details open><summary>Pontos de Fábula</summary><ul><li><b>Evocar Traço:</b> gaste 1 PF e use Identidade, Tema ou Origem para rolar novamente um ou ambos os dados. O novo resultado permanece.</li><li><b>Evocar Laço:</b> gaste 1 PF e some a força do Laço ao teste, uma vez por teste.</li><li>Não é possível evocar um Traço depois de uma falha crítica.</li></ul></details>
+          <details open><summary>Condições</summary><ul><li>Abalado: VON −1 passo.</li><li>Atordoado: AST −1 passo.</li><li>Enfurecido: DES e AST −1 passo.</li><li>Envenenado: VIG e VON −1 passo.</li><li>Fraco: VIG −1 passo.</li><li>Lento: DES −1 passo.</li></ul><p>Condições diferentes se acumulam; nenhum dado cai abaixo de d6.</p></details>
+          <details open><summary>Testes opostos e em grupo</summary><p><b>Oposto:</b> ambos rolam sem ND; o maior total vence e empates são rolados novamente. Crítico supera resultado normal; falha crítica é o pior resultado.</p><p><b>Grupo:</b> o líder faz o teste final. Apoiadores testam a mesma fórmula contra ND 10; cada sucesso dá +1 ao líder. Entre os apoiadores bem-sucedidos, some também o Laço mais forte com o líder.</p></details>
+          <details open><summary>Boas Oportunidades</summary><ul><li><b>Vantagem:</b> dê +4 ao próximo teste seu ou de um aliado.</li><li><b>Avaliar:</b> descubra uma Vulnerabilidade ou Traço.</li><li><b>Progresso:</b> preencha ou apague até 2 seções de um relógio.</li><li><b>Desmascarar:</b> descubra objetivos e motivações de uma criatura.</li></ul><p>Em Ignis e Glacies, o crítico também pode acionar a Oportunidade própria do feitiço.</p></details>
+          <details open><summary>Plano de turno do Ryker</summary><ol><li>Se a Afinidade for desconhecida, peça Estudo ao grupo.</li><li>Explore Vulnerabilidade; use Raio contra simples Resistência.</li><li>Use Aceleração cedo se a cena durar ao menos duas rodadas.</li><li>Quando PM apertar, use Drenar Espírito em alvo que ainda tenha PM.</li><li>Se a linha de frente estiver em risco, Curar; se Ryker estiver focado, Guarda.</li></ol></details>
+        </div>
       </section>
 
       <section className="content-section" id="classes">
@@ -184,7 +368,7 @@ export default function RykerSheet() {
           </article>
 
           <article className="inventory-ledger">
-            <div className="inventory-title"><div><span>Mochila de campo</span><h3>Inventário</h3></div><strong>{ip}<small>/ 6 PI</small></strong></div>
+            <div className="inventory-title"><div><span>Reserva abstrata</span><h3>Itens de PI</h3></div><strong>{ip}<small>/ 6 PI</small></strong></div>
             <div className="inventory-head"><span>Item</span><span>Qtd./Custo</span><span>Efeito</span></div>
             <ul className="inventory-list">
               <li><span className="item-mark potion">✦</span><b>Elixir</b><em>3 PI</em><p>Recupera 50 PM</p></li>
@@ -192,9 +376,26 @@ export default function RykerSheet() {
               <li><span className="item-mark tonic">◇</span><b>Tônico</b><em>2 PI</em><p>Remove todas as condições</p></li>
               <li><span className="item-mark shard">ϟ</span><b>Fragmento elemental</b><em>2 PI</em><p>Causa 10 de dano elemental</p></li>
               <li><span className="item-mark tent">⌂</span><b>Barraca mágica</b><em>4 PI</em><p>Permite descansar nos ermos</p></li>
-              <li><span className="item-mark holy">✧</span><b>Água Benta</b><em>×1</em><p>Item especial · efeito definido pelo Mestre</p></li>
             </ul>
             <div className="inventory-foot"><span>Itens de PI são criados e usados imediatamente.</span><b>Equipamento: 500z / 500z</b></div>
+
+            <div className="inventory-title backpack-title"><div><span>Objetos carregados</span><h3>Mochila editável</h3></div><strong>{inventoryItems.reduce((sum, item) => sum + item.quantity, 0)}<small>un.</small></strong></div>
+            <ul className="backpack-list">
+              {inventoryItems.length === 0 && <li className="empty-backpack">A mochila está vazia. Adicione um item abaixo.</li>}
+              {inventoryItems.map((item) => <li key={item.id}>
+                <span className="item-mark holy">✧</span>
+                <div><b>{item.name}</b><p>{item.note || "Sem anotação"}</p></div>
+                <div className="quantity-control"><button type="button" onClick={() => changeItemQuantity(item.id, item.quantity - 1)} aria-label={`Diminuir quantidade de ${item.name}`}>−</button><strong>{item.quantity}</strong><button type="button" onClick={() => changeItemQuantity(item.id, item.quantity + 1)} aria-label={`Aumentar quantidade de ${item.name}`}>+</button></div>
+                <button className="delete-item" type="button" onClick={() => setInventoryItems((current) => current.filter((candidate) => candidate.id !== item.id))} aria-label={`Excluir ${item.name}`}>Excluir</button>
+              </li>)}
+            </ul>
+            <form className="inventory-form" onSubmit={addInventoryItem}>
+              <label>Item<input required maxLength={60} value={newItemName} onChange={(event) => setNewItemName(event.currentTarget.value)} placeholder="Ex.: estaca de prata" /></label>
+              <label>Qtd.<input type="number" min={1} max={99} value={newItemQuantity} onChange={(event) => setNewItemQuantity(Math.max(1, Math.min(99, Number(event.currentTarget.value) || 1)))} /></label>
+              <label className="item-note">Anotação<input maxLength={140} value={newItemNote} onChange={(event) => setNewItemNote(event.currentTarget.value)} placeholder="Efeito, origem ou detalhe" /></label>
+              <button type="submit">Adicionar item</button>
+            </form>
+            <p className="inventory-save-note">A mochila é salva automaticamente neste navegador junto com PV, PM, PI e XP.</p>
           </article>
         </div>
       </section>
