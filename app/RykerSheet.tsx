@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ResourceProps = {
   label: string;
@@ -22,6 +22,13 @@ const spells = [
 const attributes = [["DES", "Destreza", "d6"], ["AST", "Astúcia", "d8"], ["VIG", "Vigor", "d8"], ["VON", "Vontade", "d10"]];
 const conditions = ["Lento", "Furioso", "Atordoado", "Fraco", "Envenenado", "Abalado"];
 const assetPath = (name: string) => `${import.meta.env.BASE_URL}${name.replace(/^\//, "")}`;
+const storageKey = "ryker-sheet-state-v1";
+const initialState = { hp: 48, mp: 73, ip: 6, fabula: 3, xp: 6, activeConditions: [] as string[] };
+
+const savedNumber = (value: unknown, fallback: number, maximum: number) =>
+  typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.min(maximum, Math.trunc(value)))
+    : fallback;
 
 function Resource({ label, value, max, tone, onChange }: ResourceProps) {
   const percent = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
@@ -59,14 +66,48 @@ function Resource({ label, value, max, tone, onChange }: ResourceProps) {
 }
 
 export default function RykerSheet() {
-  const [hp, setHp] = useState(48);
-  const [mp, setMp] = useState(73);
-  const [ip, setIp] = useState(6);
-  const [fabula, setFabula] = useState(3);
-  const [xp, setXp] = useState(6);
+  const [hp, setHp] = useState(initialState.hp);
+  const [mp, setMp] = useState(initialState.mp);
+  const [ip, setIp] = useState(initialState.ip);
+  const [fabula, setFabula] = useState(initialState.fabula);
+  const [xp, setXp] = useState(initialState.xp);
   const [activeConditions, setActiveConditions] = useState<string[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
 
-  const reset = () => { setHp(48); setMp(73); setIp(6); setFabula(3); setActiveConditions([]); };
+  useEffect(() => {
+    try {
+      const storedState = window.localStorage.getItem(storageKey);
+      if (storedState) {
+        const saved = JSON.parse(storedState) as Record<string, unknown>;
+        setHp(savedNumber(saved.hp, initialState.hp, initialState.hp));
+        setMp(savedNumber(saved.mp, initialState.mp, initialState.mp));
+        setIp(savedNumber(saved.ip, initialState.ip, initialState.ip));
+        setFabula(savedNumber(saved.fabula, initialState.fabula, 5));
+        setXp(savedNumber(saved.xp, initialState.xp, 10));
+        setActiveConditions(Array.isArray(saved.activeConditions)
+          ? saved.activeConditions.filter((condition): condition is string => typeof condition === "string" && conditions.includes(condition))
+          : initialState.activeConditions);
+      }
+    } catch {
+      window.localStorage.removeItem(storageKey);
+    } finally {
+      setStorageReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    window.localStorage.setItem(storageKey, JSON.stringify({ hp, mp, ip, fabula, xp, activeConditions }));
+  }, [storageReady, hp, mp, ip, fabula, xp, activeConditions]);
+
+  const reset = () => {
+    setHp(initialState.hp);
+    setMp(initialState.mp);
+    setIp(initialState.ip);
+    setFabula(initialState.fabula);
+    setXp(initialState.xp);
+    setActiveConditions(initialState.activeConditions);
+  };
   const toggleCondition = (condition: string) => setActiveConditions((current) => current.includes(condition) ? current.filter((item) => item !== condition) : [...current, condition]);
 
   return (
@@ -98,7 +139,7 @@ export default function RykerSheet() {
       <section className="state-panel" id="estado">
         <div className="section-heading compact">
           <div><p>Controle de sessão</p><h2>Estado atual</h2></div>
-          <div className="panel-actions"><button type="button" onClick={reset}>Restaurar ficha</button><button type="button" onClick={() => window.print()}>Imprimir</button></div>
+          <div className="panel-actions"><span className="save-status" aria-live="polite">{storageReady ? "Salvo neste dispositivo" : "Carregando ficha..."}</span><button type="button" onClick={reset}>Restaurar ficha</button><button type="button" onClick={() => window.print()}>Imprimir</button></div>
         </div>
         <div className="resources">
           <Resource label="Pontos de Vida" value={hp} max={48} tone="blood" onChange={setHp} />

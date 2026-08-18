@@ -69,6 +69,8 @@ blockquote { margin: 0; max-width: 39rem; padding-left: 1.5rem; border-left: 1px
 .section-heading.light h2 { color: #f2e8d9; }
 .section-mark { color: #bd925455; font-size: 5rem; line-height: .8; }
 .panel-actions { display: flex; gap: .55rem; }
+.save-status { align-self: center; margin-right: .35rem; color: #6e5a50; font: 700 .58rem Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.save-status::before { content: "●"; margin-right: .45rem; color: #54735e; }
 .panel-actions button { padding: .7rem .9rem; border: 1px solid #5d483b55; background: transparent; color: #40322c; cursor: pointer; font: 700 .64rem Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 .panel-actions button:hover, .panel-actions button:focus-visible { background: #21171b; color: #fff; outline: none; }
 
