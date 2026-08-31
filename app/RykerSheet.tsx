@@ -31,8 +31,8 @@ const spells: Spell[] = [
   { name: "Glacies", school: "Elementalismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de gelo a cada alvo atingido.", note: "Oportunidade: cada alvo atingido também fica Lento.", sigil: "❄", color: "frost", offensive: true },
   { name: "Aceleração", school: "Entropismo", cost: "20 PM", target: "Uma criatura", type: "Duração: Cena", effect: "No fim de cada turno de Ryker, o alvo faz um ataque livre ou lança um feitiço de até 10 PM sem gastar uma ação.", note: "Termina depois que o mesmo alvo usa o efeito duas vezes.", sigil: "⌛", color: "time", offensive: false },
   { name: "Drenar Espírito", school: "Entropismo", cost: "5 PM", target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "O alvo perde RA + 20 PM. Ryker recupera metade dos PM realmente perdidos.", note: "Sem PM no alvo, não há recuperação.", sigil: "◉", color: "void", offensive: true },
+  { name: "Parar", school: "Entropismo", cost: "10 PM", target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "Se for atingido, o alvo realiza uma ação a menos em seu próximo turno.", note: "Quando Ryker é o alvo de Aceleração, Parar cabe no limite de 10 PM do feitiço livre.", sigil: "⏳", color: "time", offensive: true },
   { name: "Curar", school: "Espiritualismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Suporte · Instantâneo", effect: "Cada alvo recupera 40 Pontos de Vida.", note: "Com Aceleração, pode curar um alvo por 10 PM sem gastar uma ação.", sigil: "✦", color: "ward", offensive: false },
-  { name: "Lux", school: "Espiritualismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de luz a cada alvo atingido.", note: "Oportunidade: cada alvo atingido também fica Atordoado.", sigil: "☼", color: "ward", offensive: true },
 ];
 
 const attributes = [["DES", "Destreza", "d6"], ["AST", "Astúcia", "d8"], ["VIG", "Vigor", "d8"], ["VON", "Vontade", "d10"]];
@@ -182,7 +182,7 @@ export default function RykerSheet() {
         <div className="hero-copy">
           <p className="eyebrow">Arquivo do Mosteiro do Sol Negro · Sigilo quebrado</p>
           <h1>Ryker <em>Maximilian Severus von Falkenrath</em></h1>
-          <p className="title">Dhampir · Exorcista · Elementalista VI / Entropista II / Espiritualista II</p>
+          <p className="title">Dhampir · Exorcista · Elementalista VI / Entropista III / Espiritualista I</p>
           <blockquote>“Eu devoro a magia dos monstros para não me tornar um deles.”</blockquote>
           <div className="identity-grid">
             <div><span>Identidade</span><b>Exorcista que devora magia monstruosa para continuar humano.</b></div>
@@ -241,8 +241,8 @@ export default function RykerSheet() {
           <details open><summary>Pontos de Fábula</summary><ul><li><b>Evocar Traço:</b> gaste 1 PF e use Identidade, Tema ou Origem para rolar novamente um ou ambos os dados. O novo resultado permanece.</li><li><b>Evocar Laço:</b> gaste 1 PF e some a força do Laço ao teste, uma vez por teste.</li><li>Não é possível evocar um Traço depois de uma falha crítica.</li></ul></details>
           <details open><summary>Condições</summary><ul><li>Abalado: VON −1 passo.</li><li>Atordoado: AST −1 passo.</li><li>Enfurecido: DES e AST −1 passo.</li><li>Envenenado: VIG e VON −1 passo.</li><li>Fraco: VIG −1 passo.</li><li>Lento: DES −1 passo.</li></ul><p>Condições diferentes se acumulam; nenhum dado cai abaixo de d6.</p></details>
           <details open><summary>Testes opostos e em grupo</summary><p><b>Oposto:</b> ambos rolam sem ND; o maior total vence e empates são rolados novamente. Crítico supera resultado normal; falha crítica é o pior resultado.</p><p><b>Grupo:</b> o líder faz o teste final. Apoiadores testam a mesma fórmula contra ND 10; cada sucesso dá +1 ao líder. Entre os apoiadores bem-sucedidos, some também o Laço mais forte com o líder.</p></details>
-          <details open><summary>Boas Oportunidades</summary><ul><li><b>Vantagem:</b> dê +4 ao próximo teste seu ou de um aliado.</li><li><b>Avaliar:</b> descubra uma Vulnerabilidade ou Traço.</li><li><b>Progresso:</b> preencha ou apague até 2 seções de um relógio.</li><li><b>Desmascarar:</b> descubra objetivos e motivações de uma criatura.</li></ul><p>Em Ignis, Glacies e Lux, o crítico também pode acionar a Oportunidade própria do feitiço.</p></details>
-          <details open><summary>Plano de turno do Ryker</summary><ol><li>Se a Afinidade for desconhecida, peça Estudo ao grupo.</li><li>Explore Vulnerabilidade; use Raio contra simples Resistência.</li><li>Use Lux quando dano de luz for vantajoso ou Atordoado puder desmontar a ofensiva inimiga.</li><li>Use Aceleração cedo se a cena durar ao menos duas rodadas.</li><li>Quando PM apertar, use Drenar Espírito em alvo que ainda tenha PM.</li><li>Se a linha de frente estiver em risco, Curar; se Ryker estiver focado, Guarda.</li></ol></details>
+          <details open><summary>Boas Oportunidades</summary><ul><li><b>Vantagem:</b> dê +4 ao próximo teste seu ou de um aliado.</li><li><b>Avaliar:</b> descubra uma Vulnerabilidade ou Traço.</li><li><b>Progresso:</b> preencha ou apague até 2 seções de um relógio.</li><li><b>Desmascarar:</b> descubra objetivos e motivações de uma criatura.</li></ul><p>Em Ignis e Glacies, o crítico também pode acionar a Oportunidade própria do feitiço.</p></details>
+          <details open><summary>Plano de turno do Ryker</summary><ol><li>Se a Afinidade for desconhecida, peça Estudo ao grupo.</li><li>Explore Vulnerabilidade; use Raio contra simples Resistência.</li><li>Contra elites e vilões, use Parar para reduzir as ações do próximo turno inimigo.</li><li>Use Aceleração cedo se a cena durar ao menos duas rodadas; se Ryker for o alvo, Parar cabe no feitiço livre de 10 PM.</li><li>Quando PM apertar, use Drenar Espírito em alvo que ainda tenha PM.</li><li>Se a linha de frente estiver em risco, Curar; se Ryker estiver focado, Guarda.</li></ol></details>
         </div>
       </section>
 
@@ -250,8 +250,8 @@ export default function RykerSheet() {
         <div className="section-heading"><div><p>Disciplinas dominadas</p><h2>Classes e poderes</h2></div></div>
         <div className="class-grid">
           <article><span className="level">Nível 6</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental III</b> — aprende Ignis, Raio e Glacies.</li><li><b>Artilharia Mágica III</b> — +6 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li></ul></article>
-          <article><span className="level">Nível 2</span><p className="micro-label">Entropista</p><h3>A fome entre instantes</h3><ul><li><b>Magia Entrópica II</b> — aprende Aceleração e Drenar Espírito.</li><li><b>Benefício</b> — +5 PM e rituais de Entropismo.</li><li><b>Função</b> — economia de ações e autossustentação de PM.</li></ul></article>
-          <article><span className="level">Nível 2</span><p className="micro-label">Espiritualista</p><h3>A luz que preserva</h3><ul><li><b>Magia Espiritual II</b> — aprende Curar e Lux.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li><li><b>Função</b> — cura aliados ou causa dano de luz e Atordoado.</li></ul></article>
+          <article><span className="level">Nível 3</span><p className="micro-label">Entropista</p><h3>A fome entre instantes</h3><ul><li><b>Magia Entrópica III</b> — aprende Aceleração, Drenar Espírito e Parar.</li><li><b>Benefício</b> — +5 PM e rituais de Entropismo.</li><li><b>Função</b> — economia de ações, controle e autossustentação de PM.</li></ul></article>
+          <article><span className="level">Nível 1</span><p className="micro-label">Espiritualista</p><h3>A luz que preserva</h3><ul><li><b>Magia Espiritual I</b> — aprende Curar.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li><li><b>Função</b> — cura confiável para Ryker e seus aliados.</li></ul></article>
         </div>
       </section>
 
