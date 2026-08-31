@@ -171,10 +171,6 @@ export default function RykerSheet() {
     return () => window.removeEventListener("hashchange", syncPageWithHash);
   }, []);
 
-  useEffect(() => {
-    document.title = `Ryker · ${pageLabels[activePage]}`;
-  }, [activePage]);
-
   const reset = () => {
     setHp(initialState.hp);
     setMp(initialState.mp);
