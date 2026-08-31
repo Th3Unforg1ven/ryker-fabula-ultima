@@ -25,6 +25,19 @@ type Spell = {
 
 type InventoryItem = { id: string; name: string; quantity: number; note: string };
 
+const pageIds = ["perfil", "estado", "magias", "manual", "classes", "equipamento", "historia", "anotacoes"] as const;
+type PageId = (typeof pageIds)[number];
+const pageLabels: Record<PageId, string> = {
+  perfil: "Perfil",
+  estado: "Estado",
+  magias: "Magias",
+  manual: "Manual",
+  classes: "Classes",
+  equipamento: "Equipamento",
+  historia: "História",
+  anotacoes: "Anotações",
+};
+
 const spells: Spell[] = [
   { name: "Ignis", school: "Elementalismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de fogo a cada alvo atingido.", note: "Oportunidade: cada alvo atingido fica Abalado.", sigil: "✹", color: "ember", offensive: true },
   { name: "Raio", school: "Elementalismo", cost: "20 PM", target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "Causa RA + 25 de dano de raio.", note: "O dano ignora Resistências, mas não Imunidade ou Absorção.", sigil: "ϟ", color: "storm", offensive: true },
@@ -95,6 +108,8 @@ export default function RykerSheet() {
   const [xp, setXp] = useState(initialState.xp);
   const [activeConditions, setActiveConditions] = useState<string[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>(defaultInventory);
+  const [notes, setNotes] = useState("");
+  const [activePage, setActivePage] = useState<PageId>("perfil");
   const [newItemName, setNewItemName] = useState("");
   const [newItemQuantity, setNewItemQuantity] = useState(1);
   const [newItemNote, setNewItemNote] = useState("");
@@ -130,6 +145,7 @@ export default function RykerSheet() {
             }];
           })
           : initialState.inventoryItems);
+        setNotes(typeof saved.notes === "string" ? saved.notes.slice(0, 20000) : "");
       }
     } catch {
       window.localStorage.removeItem(storageKey);
@@ -141,8 +157,23 @@ export default function RykerSheet() {
 
   useEffect(() => {
     if (!storageReady) return;
-    window.localStorage.setItem(storageKey, JSON.stringify({ version: sheetVersion, hp, mp, ip, fabula, xp, activeConditions, inventoryItems }));
-  }, [storageReady, hp, mp, ip, fabula, xp, activeConditions, inventoryItems]);
+    window.localStorage.setItem(storageKey, JSON.stringify({ version: sheetVersion, hp, mp, ip, fabula, xp, activeConditions, inventoryItems, notes }));
+  }, [storageReady, hp, mp, ip, fabula, xp, activeConditions, inventoryItems, notes]);
+
+  useEffect(() => {
+    const syncPageWithHash = () => {
+      const candidate = window.location.hash.replace(/^#/, "") as PageId;
+      setActivePage(pageIds.includes(candidate) ? candidate : "perfil");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
+    syncPageWithHash();
+    window.addEventListener("hashchange", syncPageWithHash);
+    return () => window.removeEventListener("hashchange", syncPageWithHash);
+  }, []);
+
+  useEffect(() => {
+    document.title = `Ryker · ${pageLabels[activePage]}`;
+  }, [activePage]);
 
   const reset = () => {
     setHp(initialState.hp);
@@ -172,8 +203,18 @@ export default function RykerSheet() {
   };
 
   return (
-    <main>
-      <header className="hero" id="topo">
+    <main data-page={activePage}>
+      <nav className="section-nav" aria-label="Páginas da ficha">
+        {pageIds.map((page) => <a
+          href={`#${page}`}
+          aria-current={activePage === page ? "page" : undefined}
+          onClick={() => setActivePage(page)}
+          key={page}
+        >{pageLabels[page]}</a>)}
+      </nav>
+
+      <div className="sheet-page profile-page" id="perfil" hidden={activePage !== "perfil"}>
+      <header className="hero">
         <div className="portrait-wrap">
           <img className="portrait" src={assetPath("ryker.jpg")} alt="Ryker com sua máscara ritual de marfim" />
           <div className="portrait-index" aria-hidden="true"><span>†</span><b>X</b></div>
@@ -193,11 +234,13 @@ export default function RykerSheet() {
         </div>
       </header>
 
-      <nav className="section-nav" aria-label="Seções da ficha">
-        <a href="#estado">Estado</a><a href="#magias">Magias</a><a href="#manual">Manual</a><a href="#classes">Classes</a><a href="#equipamento">Equipamento</a><a href="#historia">História</a><a href="#perfil">Perfil</a>
-      </nav>
+      <section className="content-section profile">
+        <div className="profile-copy"><p className="eyebrow">O homem sob o selo</p><h2>A fome e a fé</h2><p>Alto e pálido, Ryker veste um sobretudo negro sobre vestes costuradas com fios de prata. Seus olhos ficam rubros ao absorver magia; runas escuras surgem nas mãos e no pescoço sempre que conjura.</p><p>Carrega um tomo de couro queimado, preso por corrente, e um rosário quebrado do Mosteiro do Sol Negro. Sua voz permanece baixa e controlada — como se cada palavra também mantivesse a fome sob controle.</p></div>
+        <div className="oath"><span aria-hidden="true">✦</span><blockquote>“Se o meu poder vem das mesmas criaturas que caço, o que exatamente me diferencia delas?”</blockquote><small>Tema: Dúvida</small></div>
+      </section>
+      </div>
 
-      <section className="state-panel" id="estado">
+      <section className="state-panel sheet-page" id="estado" hidden={activePage !== "estado"}>
         <div className="section-heading compact">
           <div><p>Controle de sessão</p><h2>Estado atual</h2></div>
           <div className="panel-actions"><span className="save-status" aria-live="polite">{storageReady ? "Salvo neste dispositivo" : "Carregando ficha..."}</span><button type="button" onClick={reset}>Restaurar ficha</button><button type="button" onClick={() => window.print()}>Imprimir</button></div>
@@ -216,7 +259,7 @@ export default function RykerSheet() {
         </div>
       </section>
 
-      <section className="content-section" id="magias">
+      <section className="content-section sheet-page" id="magias" hidden={activePage !== "magias"}>
         <div className="section-heading"><div><p>Liturgia profana</p><h2>Grimório de campo</h2></div><span className="section-mark" aria-hidden="true">VII</span></div>
         <div className="spell-grid">{spells.map((spell) => <article className={`spell-card ${spell.color}`} key={spell.name}>
             <div className="spell-sigil" aria-hidden="true">{spell.sigil}</div><div className="spell-top"><span>{spell.school}</span><b>{spell.cost}</b></div>
@@ -226,7 +269,7 @@ export default function RykerSheet() {
         <p className="formula-note"><span>Importante</span> crítico é par de 6 ou mais; ele acerta automaticamente e gera uma Oportunidade, mas não dobra o dano.</p>
       </section>
 
-      <section className="content-section quick-reference" id="manual">
+      <section className="content-section quick-reference sheet-page" id="manual" hidden={activePage !== "manual"}>
         <div className="section-heading"><div><p>Folha de consulta</p><h2>Manual rápido de mesa</h2></div><span className="section-mark" aria-hidden="true">✦</span></div>
         <div className="roll-guide">
           <div><p className="micro-label">Como montar a rolagem</p><h3>Role dois dados e some</h3><p>Escolha os dois Atributos pedidos, role os dados correspondentes, some os valores e aplique o modificador. A RA é apenas o maior resultado natural entre os dados.</p></div>
@@ -246,7 +289,7 @@ export default function RykerSheet() {
         </div>
       </section>
 
-      <section className="content-section" id="classes">
+      <section className="content-section sheet-page" id="classes" hidden={activePage !== "classes"}>
         <div className="section-heading"><div><p>Disciplinas dominadas</p><h2>Classes e poderes</h2></div></div>
         <div className="class-grid">
           <article><span className="level">Nível 6</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental III</b> — aprende Ignis, Raio e Glacies.</li><li><b>Artilharia Mágica III</b> — +6 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li></ul></article>
@@ -255,7 +298,7 @@ export default function RykerSheet() {
         </div>
       </section>
 
-      <section className="content-section loadout" id="equipamento">
+      <section className="content-section loadout sheet-page" id="equipamento" hidden={activePage !== "equipamento"}>
         <div className="section-heading light"><div><p>Relíquias autorizadas</p><h2>Equipamento</h2></div><span className="zenit">2d6 × 10z <small>dinheiro inicial · 20–120z</small></span></div>
         <div className="equipment-shell">
           <article className="paper-doll" aria-label="Equipamentos vestidos por Ryker">
@@ -301,7 +344,7 @@ export default function RykerSheet() {
         </div>
       </section>
 
-      <section className="content-section story" id="historia">
+      <section className="content-section story sheet-page" id="historia" hidden={activePage !== "historia"}>
         <div className="section-heading"><div><p>Confissão preservada em cinzas</p><h2>A história do Sol Negro</h2></div><span className="section-mark" aria-hidden="true">☉</span></div>
         <div className="story-layout">
           <div className="chapters">
@@ -318,12 +361,22 @@ export default function RykerSheet() {
         </div>
       </section>
 
-      <section className="content-section profile" id="perfil">
-        <div className="profile-copy"><p className="eyebrow">O homem sob o selo</p><h2>A fome e a fé</h2><p>Alto e pálido, Ryker veste um sobretudo negro sobre vestes costuradas com fios de prata. Seus olhos ficam rubros ao absorver magia; runas escuras surgem nas mãos e no pescoço sempre que conjura.</p><p>Carrega um tomo de couro queimado, preso por corrente, e um rosário quebrado do Mosteiro do Sol Negro. Sua voz permanece baixa e controlada — como se cada palavra também mantivesse a fome sob controle.</p></div>
-        <div className="oath"><span aria-hidden="true">✦</span><blockquote>“Se o meu poder vem das mesmas criaturas que caço, o que exatamente me diferencia delas?”</blockquote><small>Tema: Dúvida</small></div>
+      <section className="content-section notes-page sheet-page" id="anotacoes" hidden={activePage !== "anotacoes"}>
+        <div className="section-heading"><div><p>Diário do exorcista</p><h2>Anotações da campanha</h2></div><span className="section-mark" aria-hidden="true">✎</span></div>
+        <div className="notes-shell">
+          <div className="notes-meta"><span>{storageReady ? "Salvo automaticamente neste dispositivo" : "Carregando anotações..."}</span><b>{notes.length.toLocaleString("pt-BR")} / 20.000</b></div>
+          <textarea
+            value={notes}
+            maxLength={20000}
+            onChange={(event) => setNotes(event.currentTarget.value)}
+            aria-label="Anotações da campanha"
+            placeholder={"Sessão, local e objetivo atual…\n\nPistas e nomes importantes:\n• \n\nPendências do grupo:\n• \n\nRecursos gastos ou recuperados:\n• "}
+          />
+          <div className="notes-actions"><button type="button" onClick={() => { if (window.confirm("Apagar todas as anotações salvas?")) setNotes(""); }}>Limpar anotações</button></div>
+        </div>
       </section>
 
-      <footer><a href="#topo">Retornar ao selo</a><span>Fabula Ultima · Ficha de Ryker</span></footer>
+      <footer><a href="#perfil">Abrir perfil de Ryker</a><span>{pageLabels[activePage]} · Fabula Ultima</span></footer>
     </main>
   );
 }
