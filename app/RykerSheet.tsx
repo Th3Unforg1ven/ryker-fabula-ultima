@@ -32,16 +32,20 @@ const spells: Spell[] = [
   { name: "Aceleração", school: "Entropismo", cost: "20 PM", target: "Uma criatura", type: "Duração: Cena", effect: "No fim de cada turno de Ryker, o alvo faz um ataque livre ou lança um feitiço de até 10 PM sem gastar uma ação.", note: "Termina depois que o mesmo alvo usa o efeito duas vezes.", sigil: "⌛", color: "time", offensive: false },
   { name: "Drenar Espírito", school: "Entropismo", cost: "5 PM", target: "Uma criatura", type: "Ofensivo · Instantâneo", effect: "O alvo perde RA + 20 PM. Ryker recupera metade dos PM realmente perdidos.", note: "Sem PM no alvo, não há recuperação.", sigil: "◉", color: "void", offensive: true },
   { name: "Curar", school: "Espiritualismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Suporte · Instantâneo", effect: "Cada alvo recupera 40 Pontos de Vida.", note: "Com Aceleração, pode curar um alvo por 10 PM sem gastar uma ação.", sigil: "✦", color: "ward", offensive: false },
+  { name: "Lux", school: "Espiritualismo", cost: "10 × A PM", target: "Até 3 criaturas", type: "Ofensivo · Instantâneo", effect: "Causa RA + 15 de dano de luz a cada alvo atingido.", note: "Oportunidade: cada alvo atingido também fica Atordoado.", sigil: "☼", color: "ward", offensive: true },
 ];
 
 const attributes = [["DES", "Destreza", "d6"], ["AST", "Astúcia", "d8"], ["VIG", "Vigor", "d8"], ["VON", "Vontade", "d10"]];
 const conditions = ["Lento", "Enfurecido", "Atordoado", "Fraco", "Envenenado", "Abalado"];
 const assetPath = (name: string) => `${import.meta.env.BASE_URL}${name.replace(/^\//, "")}`;
 const storageKey = "ryker-sheet-state-v1";
+const sheetVersion = 2;
+const maximumHp = 50;
+const maximumMp = 75;
 const defaultInventory: InventoryItem[] = [
   { id: "agua-benta", name: "Água Benta", quantity: 1, note: "Item especial · efeito definido pelo Mestre" },
 ];
-const initialState = { hp: 48, mp: 73, ip: 6, fabula: 3, xp: 6, activeConditions: [] as string[], inventoryItems: defaultInventory };
+const initialState = { hp: maximumHp, mp: maximumMp, ip: 6, fabula: 3, xp: 7, activeConditions: [] as string[], inventoryItems: defaultInventory };
 
 const savedNumber = (value: unknown, fallback: number, maximum: number) =>
   typeof value === "number" && Number.isFinite(value)
@@ -102,11 +106,12 @@ export default function RykerSheet() {
       const storedState = window.localStorage.getItem(storageKey);
       if (storedState) {
         const saved = JSON.parse(storedState) as Record<string, unknown>;
-        setHp(savedNumber(saved.hp, initialState.hp, initialState.hp));
-        setMp(savedNumber(saved.mp, initialState.mp, initialState.mp));
+        const isLegacyLevelEightState = saved.version !== sheetVersion;
+        setHp(savedNumber(saved.hp, initialState.hp, maximumHp));
+        setMp(savedNumber(saved.mp, initialState.mp, maximumMp));
         setIp(savedNumber(saved.ip, initialState.ip, initialState.ip));
         setFabula(savedNumber(saved.fabula, initialState.fabula, 5));
-        setXp(savedNumber(saved.xp, initialState.xp, 10));
+        setXp(isLegacyLevelEightState ? initialState.xp : savedNumber(saved.xp, initialState.xp, 10));
         setActiveConditions(Array.isArray(saved.activeConditions)
           ? saved.activeConditions
             .map((condition) => condition === "Furioso" ? "Enfurecido" : condition)
@@ -136,7 +141,7 @@ export default function RykerSheet() {
 
   useEffect(() => {
     if (!storageReady) return;
-    window.localStorage.setItem(storageKey, JSON.stringify({ hp, mp, ip, fabula, xp, activeConditions, inventoryItems }));
+    window.localStorage.setItem(storageKey, JSON.stringify({ version: sheetVersion, hp, mp, ip, fabula, xp, activeConditions, inventoryItems }));
   }, [storageReady, hp, mp, ip, fabula, xp, activeConditions, inventoryItems]);
 
   const reset = () => {
@@ -171,19 +176,19 @@ export default function RykerSheet() {
       <header className="hero" id="topo">
         <div className="portrait-wrap">
           <img className="portrait" src={assetPath("ryker.jpg")} alt="Ryker com sua máscara ritual de marfim" />
-          <div className="portrait-index" aria-hidden="true"><span>†</span><b>VIII</b></div>
+          <div className="portrait-index" aria-hidden="true"><span>†</span><b>X</b></div>
           <p className="portrait-caption">Ordem extinta · Registro de campo 05</p>
         </div>
         <div className="hero-copy">
           <p className="eyebrow">Arquivo do Mosteiro do Sol Negro · Sigilo quebrado</p>
           <h1>Ryker <em>Maximilian Severus von Falkenrath</em></h1>
-          <p className="title">Dhampir · Exorcista · Elementalista V / Entropista II / Espiritualista I</p>
+          <p className="title">Dhampir · Exorcista · Elementalista VI / Entropista II / Espiritualista II</p>
           <blockquote>“Eu devoro a magia dos monstros para não me tornar um deles.”</blockquote>
           <div className="identity-grid">
             <div><span>Identidade</span><b>Exorcista que devora magia monstruosa para continuar humano.</b></div>
             <div><span>Tema</span><b>Dúvida</b></div>
             <div><span>Origem</span><b>Mosteiro do Sol Negro</b></div>
-            <div><span>Nível</span><b>8</b></div>
+            <div><span>Nível</span><b>10</b></div>
           </div>
         </div>
       </header>
@@ -198,25 +203,25 @@ export default function RykerSheet() {
           <div className="panel-actions"><span className="save-status" aria-live="polite">{storageReady ? "Salvo neste dispositivo" : "Carregando ficha..."}</span><button type="button" onClick={reset}>Restaurar ficha</button><button type="button" onClick={() => window.print()}>Imprimir</button></div>
         </div>
         <div className="resources">
-          <Resource label="Pontos de Vida" value={hp} max={48} tone="blood" onChange={setHp} />
-          <Resource label="Pontos de Mente" value={mp} max={73} tone="mana" onChange={setMp} />
+          <Resource label="Pontos de Vida" value={hp} max={maximumHp} tone="blood" onChange={setHp} />
+          <Resource label="Pontos de Mente" value={mp} max={maximumMp} tone="mana" onChange={setMp} />
           <Resource label="Inventário" value={ip} max={6} tone="ink" onChange={setIp} />
           <Resource label="Pontos de Fábula" value={fabula} max={5} tone="gold" onChange={setFabula} />
           <Resource label="Experiência" value={xp} max={10} tone="gold" onChange={setXp} />
         </div>
         <div className="status-grid">
           <article className="attribute-panel"><p className="micro-label">Dados de atributo</p><div className="attributes">{attributes.map(([abbr, label, die]) => <div key={abbr}><span>{abbr}<small>{label}</small></span><strong>{die}</strong></div>)}</div></article>
-          <article className="defense-panel"><p className="micro-label">Defesas e limiar</p><div className="defenses"><div><span>Defesa</span><strong>9</strong></div><div><span>Def. Mágica</span><strong>10</strong></div><div><span>Iniciativa</span><strong>−2</strong></div><div className={hp <= 24 ? "crisis active" : "crisis"}><span>Crise</span><strong>24</strong></div></div></article>
+          <article className="defense-panel"><p className="micro-label">Defesas e limiar</p><div className="defenses"><div><span>Defesa</span><strong>9</strong></div><div><span>Def. Mágica</span><strong>10</strong></div><div><span>Iniciativa</span><strong>−2</strong></div><div className={hp <= 25 ? "crisis active" : "crisis"}><span>Crise</span><strong>25</strong></div></div></article>
           <article className="condition-panel"><p className="micro-label">Condições</p><div className="condition-list">{conditions.map((condition) => <button type="button" className={activeConditions.includes(condition) ? "active" : ""} onClick={() => toggleCondition(condition)} aria-pressed={activeConditions.includes(condition)} key={condition}>{condition}</button>)}</div></article>
         </div>
       </section>
 
       <section className="content-section" id="magias">
-        <div className="section-heading"><div><p>Liturgia profana</p><h2>Grimório de campo</h2></div><span className="section-mark" aria-hidden="true">VI</span></div>
+        <div className="section-heading"><div><p>Liturgia profana</p><h2>Grimório de campo</h2></div><span className="section-mark" aria-hidden="true">VII</span></div>
         <div className="spell-grid">{spells.map((spell) => <article className={`spell-card ${spell.color}`} key={spell.name}>
             <div className="spell-sigil" aria-hidden="true">{spell.sigil}</div><div className="spell-top"><span>{spell.school}</span><b>{spell.cost}</b></div>
             <h3>{spell.name}</h3><p className="spell-meta">{spell.target} · {spell.type}</p><p>{spell.effect}</p><small>{spell.note}</small>
-            <p className="spell-formula">{spell.offensive ? "Rolagem: d8 AST + d10 VON + 4 vs Def. Mágica · RA = maior dado" : "Rolagem: nenhuma · sucesso automático"}</p>
+            <p className="spell-formula">{spell.offensive ? "Rolagem: d8 AST + d10 VON + 6 vs Def. Mágica · RA = maior dado" : "Rolagem: nenhuma · sucesso automático"}</p>
           </article>)}</div>
         <p className="formula-note"><span>Importante</span> crítico é par de 6 ou mais; ele acerta automaticamente e gera uma Oportunidade, mas não dobra o dano.</p>
       </section>
@@ -225,28 +230,28 @@ export default function RykerSheet() {
         <div className="section-heading"><div><p>Folha de consulta</p><h2>Manual rápido de mesa</h2></div><span className="section-mark" aria-hidden="true">✦</span></div>
         <div className="roll-guide">
           <div><p className="micro-label">Como montar a rolagem</p><h3>Role dois dados e some</h3><p>Escolha os dois Atributos pedidos, role os dados correspondentes, some os valores e aplique o modificador. A RA é apenas o maior resultado natural entre os dados.</p></div>
-          <div className="roll-examples"><p><span>Magia ofensiva de Ryker</span><b>d8 AST + d10 VON + 4</b><small>Compare com a Defesa Mágica de cada alvo.</small></p><p><span>Estudo</span><b>d8 AST + d8 AST</b><small>Teste aberto: 7 / 10 / 13 / 16 indicam a qualidade.</small></p><p><span>Iniciativa de Ryker</span><b>d6 DES + d8 AST − 2</b><small>Use no teste em grupo de iniciativa.</small></p></div>
+          <div className="roll-examples"><p><span>Magia ofensiva de Ryker</span><b>d8 AST + d10 VON + 6</b><small>Compare com a Defesa Mágica de cada alvo.</small></p><p><span>Estudo</span><b>d8 AST + d8 AST</b><small>Teste aberto: 7 / 10 / 13 / 16 indicam a qualidade.</small></p><p><span>Iniciativa de Ryker</span><b>d6 DES + d8 AST − 2</b><small>Use no teste em grupo de iniciativa.</small></p></div>
         </div>
         <div className="reference-grid">
           <details open><summary>Teste comum e dificuldades</summary><p>Role exatamente dois dados de Atributo, some os resultados e modificadores. Se o total alcançar o ND, passou.</p><ul><li>ND 7: básico</li><li>ND 10: competente</li><li>ND 13: especialista</li><li>ND 16: lendário</li><li>Situação favorável ou desfavorável: normalmente ±2</li></ul></details>
           <details open><summary>Crítico, falha crítica e RA</summary><p><b>RA</b> é o maior dos dois dados. <b>Crítico</b>: dados iguais e ambos 6 ou mais; sucesso automático e uma Oportunidade. <b>Falha crítica</b>: dois resultados 1; falha automática, a oposição ganha uma Oportunidade e Ryker recebe 1 PF.</p></details>
-          <details open><summary>Magia em seis passos</summary><ol><li>Escolha feitiço e efeito.</li><li>Escolha alvos visíveis.</li><li>Confirme que pode falar e mover os braços.</li><li>Pague o custo total de PM.</li><li>Se for ofensivo, role d8 + d10 + 4 contra Def.M; suporte não rola.</li><li>Aplique RA, dano, cura ou condição.</li></ol></details>
+          <details open><summary>Magia em seis passos</summary><ol><li>Escolha feitiço e efeito.</li><li>Escolha alvos visíveis.</li><li>Confirme que pode falar e mover os braços.</li><li>Pague o custo total de PM.</li><li>Se for ofensivo, role d8 + d10 + 6 contra Def.M; suporte não rola.</li><li>Aplique RA, dano, cura ou condição.</li></ol></details>
           <details open><summary>Afinidades e dano</summary><ul><li>Vulnerável: perde o dobro de PV.</li><li>Resistente: perde metade dos PV.</li><li>Imune: perde 0 PV.</li><li>Absorvedor: recupera PV em vez de perder.</li></ul><p><b>Raio</b> ignora apenas Resistência. Imunidade e Absorção continuam valendo.</p></details>
           <details open><summary>Ações que ganham combates</summary><ul><li><b>Estudo:</b> teste aberto, geralmente AST + AST. Descubra Vulnerabilidades antes de gastar PM.</li><li><b>Guarda:</b> fica Resistente a todo dano até seu próximo turno, ganha +2 em testes opostos e pode cobrir um aliado contra ataques corpo a corpo.</li><li><b>Impedimento:</b> teste ND 10; em sucesso, cause Abalado, Atordoado, Fraco ou Lento.</li><li><b>Inventário:</b> gaste PI para criar e usar um consumível imediatamente.</li></ul></details>
           <details open><summary>Pontos de Fábula</summary><ul><li><b>Evocar Traço:</b> gaste 1 PF e use Identidade, Tema ou Origem para rolar novamente um ou ambos os dados. O novo resultado permanece.</li><li><b>Evocar Laço:</b> gaste 1 PF e some a força do Laço ao teste, uma vez por teste.</li><li>Não é possível evocar um Traço depois de uma falha crítica.</li></ul></details>
           <details open><summary>Condições</summary><ul><li>Abalado: VON −1 passo.</li><li>Atordoado: AST −1 passo.</li><li>Enfurecido: DES e AST −1 passo.</li><li>Envenenado: VIG e VON −1 passo.</li><li>Fraco: VIG −1 passo.</li><li>Lento: DES −1 passo.</li></ul><p>Condições diferentes se acumulam; nenhum dado cai abaixo de d6.</p></details>
           <details open><summary>Testes opostos e em grupo</summary><p><b>Oposto:</b> ambos rolam sem ND; o maior total vence e empates são rolados novamente. Crítico supera resultado normal; falha crítica é o pior resultado.</p><p><b>Grupo:</b> o líder faz o teste final. Apoiadores testam a mesma fórmula contra ND 10; cada sucesso dá +1 ao líder. Entre os apoiadores bem-sucedidos, some também o Laço mais forte com o líder.</p></details>
-          <details open><summary>Boas Oportunidades</summary><ul><li><b>Vantagem:</b> dê +4 ao próximo teste seu ou de um aliado.</li><li><b>Avaliar:</b> descubra uma Vulnerabilidade ou Traço.</li><li><b>Progresso:</b> preencha ou apague até 2 seções de um relógio.</li><li><b>Desmascarar:</b> descubra objetivos e motivações de uma criatura.</li></ul><p>Em Ignis e Glacies, o crítico também pode acionar a Oportunidade própria do feitiço.</p></details>
-          <details open><summary>Plano de turno do Ryker</summary><ol><li>Se a Afinidade for desconhecida, peça Estudo ao grupo.</li><li>Explore Vulnerabilidade; use Raio contra simples Resistência.</li><li>Use Aceleração cedo se a cena durar ao menos duas rodadas.</li><li>Quando PM apertar, use Drenar Espírito em alvo que ainda tenha PM.</li><li>Se a linha de frente estiver em risco, Curar; se Ryker estiver focado, Guarda.</li></ol></details>
+          <details open><summary>Boas Oportunidades</summary><ul><li><b>Vantagem:</b> dê +4 ao próximo teste seu ou de um aliado.</li><li><b>Avaliar:</b> descubra uma Vulnerabilidade ou Traço.</li><li><b>Progresso:</b> preencha ou apague até 2 seções de um relógio.</li><li><b>Desmascarar:</b> descubra objetivos e motivações de uma criatura.</li></ul><p>Em Ignis, Glacies e Lux, o crítico também pode acionar a Oportunidade própria do feitiço.</p></details>
+          <details open><summary>Plano de turno do Ryker</summary><ol><li>Se a Afinidade for desconhecida, peça Estudo ao grupo.</li><li>Explore Vulnerabilidade; use Raio contra simples Resistência.</li><li>Use Lux quando dano de luz for vantajoso ou Atordoado puder desmontar a ofensiva inimiga.</li><li>Use Aceleração cedo se a cena durar ao menos duas rodadas.</li><li>Quando PM apertar, use Drenar Espírito em alvo que ainda tenha PM.</li><li>Se a linha de frente estiver em risco, Curar; se Ryker estiver focado, Guarda.</li></ol></details>
         </div>
       </section>
 
       <section className="content-section" id="classes">
         <div className="section-heading"><div><p>Disciplinas dominadas</p><h2>Classes e poderes</h2></div></div>
         <div className="class-grid">
-          <article><span className="level">Nível 5</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental III</b> — aprende Ignis, Raio e Glacies.</li><li><b>Artilharia Mágica II</b> — +4 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li></ul></article>
+          <article><span className="level">Nível 6</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental III</b> — aprende Ignis, Raio e Glacies.</li><li><b>Artilharia Mágica III</b> — +6 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li></ul></article>
           <article><span className="level">Nível 2</span><p className="micro-label">Entropista</p><h3>A fome entre instantes</h3><ul><li><b>Magia Entrópica II</b> — aprende Aceleração e Drenar Espírito.</li><li><b>Benefício</b> — +5 PM e rituais de Entropismo.</li><li><b>Função</b> — economia de ações e autossustentação de PM.</li></ul></article>
-          <article><span className="level">Nível 1</span><p className="micro-label">Espiritualista</p><h3>A luz que preserva</h3><ul><li><b>Magia Espiritual I</b> — aprende Curar.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li><li><b>Função</b> — recupera 40 PV de até três criaturas.</li></ul></article>
+          <article><span className="level">Nível 2</span><p className="micro-label">Espiritualista</p><h3>A luz que preserva</h3><ul><li><b>Magia Espiritual II</b> — aprende Curar e Lux.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li><li><b>Função</b> — cura aliados ou causa dano de luz e Atordoado.</li></ul></article>
         </div>
       </section>
 
