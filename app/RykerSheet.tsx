@@ -52,13 +52,13 @@ const attributes = [["DES", "Destreza", "d6"], ["AST", "Astúcia", "d8"], ["VIG"
 const conditions = ["Lento", "Enfurecido", "Atordoado", "Fraco", "Envenenado", "Abalado"];
 const assetPath = (name: string) => `${import.meta.env.BASE_URL}${name.replace(/^\//, "")}`;
 const storageKey = "ryker-sheet-state-v1";
-const sheetVersion = 2;
-const maximumHp = 50;
-const maximumMp = 75;
+const sheetVersion = 3;
+const maximumHp = 51;
+const maximumMp = 76;
 const defaultInventory: InventoryItem[] = [
   { id: "agua-benta", name: "Água Benta", quantity: 1, note: "Item especial · efeito definido pelo Mestre" },
 ];
-const initialState = { hp: maximumHp, mp: maximumMp, ip: 6, fabula: 3, xp: 7, activeConditions: [] as string[], inventoryItems: defaultInventory };
+const initialState = { hp: maximumHp, mp: maximumMp, ip: 6, fabula: 3, xp: 2, activeConditions: [] as string[], inventoryItems: defaultInventory };
 
 const savedNumber = (value: unknown, fallback: number, maximum: number) =>
   typeof value === "number" && Number.isFinite(value)
@@ -121,12 +121,12 @@ export default function RykerSheet() {
       const storedState = window.localStorage.getItem(storageKey);
       if (storedState) {
         const saved = JSON.parse(storedState) as Record<string, unknown>;
-        const isLegacyLevelEightState = saved.version !== sheetVersion;
+        const isPreviousProgression = saved.version !== sheetVersion;
         setHp(savedNumber(saved.hp, initialState.hp, maximumHp));
         setMp(savedNumber(saved.mp, initialState.mp, maximumMp));
         setIp(savedNumber(saved.ip, initialState.ip, initialState.ip));
         setFabula(savedNumber(saved.fabula, initialState.fabula, 5));
-        setXp(isLegacyLevelEightState ? initialState.xp : savedNumber(saved.xp, initialState.xp, 10));
+        setXp(isPreviousProgression ? initialState.xp : savedNumber(saved.xp, initialState.xp, 10));
         setActiveConditions(Array.isArray(saved.activeConditions)
           ? saved.activeConditions
             .map((condition) => condition === "Furioso" ? "Enfurecido" : condition)
@@ -219,13 +219,13 @@ export default function RykerSheet() {
         <div className="hero-copy">
           <p className="eyebrow">Arquivo do Mosteiro do Sol Negro · Sigilo quebrado</p>
           <h1>Ryker <em>Maximilian Severus von Falkenrath</em></h1>
-          <p className="title">Dhampir · Exorcista · Elementalista VI / Entropista III / Espiritualista I</p>
+          <p className="title">Dhampir · Exorcista · Elementalista VII / Entropista III / Espiritualista I</p>
           <blockquote>“Eu devoro a magia dos monstros para não me tornar um deles.”</blockquote>
           <div className="identity-grid">
             <div><span>Identidade</span><b>Exorcista que devora magia monstruosa para continuar humano.</b></div>
             <div><span>Tema</span><b>Dúvida</b></div>
             <div><span>Origem</span><b>Mosteiro do Sol Negro</b></div>
-            <div><span>Nível</span><b>10</b></div>
+            <div><span>Nível</span><b>11</b></div>
           </div>
         </div>
       </header>
@@ -262,6 +262,7 @@ export default function RykerSheet() {
             <h3>{spell.name}</h3><p className="spell-meta">{spell.target} · {spell.type}</p><p>{spell.effect}</p><small>{spell.note}</small>
             <p className="spell-formula">{spell.offensive ? "Rolagem: d8 AST + d10 VON + 6 vs Def. Mágica · RA = maior dado" : "Rolagem: nenhuma · sucesso automático"}</p>
           </article>)}</div>
+        <p className="formula-note"><span>Cataclismo I</span> ao lançar um feitiço instantâneo com o Tomo equipado, Ryker pode pagar até 10 PM adicionais para causar +5 de dano a cada alvo atingido.</p>
         <p className="formula-note"><span>Importante</span> crítico é par de 6 ou mais; ele acerta automaticamente e gera uma Oportunidade, mas não dobra o dano.</p>
       </section>
 
@@ -288,7 +289,7 @@ export default function RykerSheet() {
       <section className="content-section sheet-page" id="classes" hidden={activePage !== "classes"}>
         <div className="section-heading"><div><p>Disciplinas dominadas</p><h2>Classes e poderes</h2></div></div>
         <div className="class-grid">
-          <article><span className="level">Nível 6</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental III</b> — aprende Ignis, Raio e Glacies.</li><li><b>Artilharia Mágica III</b> — +6 em testes de Magia ofensiva com arma arcana.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li></ul></article>
+          <article><span className="level">Nível 7</span><p className="micro-label">Elementalista</p><h3>O fogo que julga</h3><ul><li><b>Magia Elemental III</b> — aprende Ignis, Raio e Glacies.</li><li><b>Artilharia Mágica III</b> — +6 em testes de Magia ofensiva com arma arcana.</li><li><b>Cataclismo I</b> — em feitiço instantâneo com arma arcana, pode pagar até +10 PM para causar +5 de dano.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li></ul></article>
           <article><span className="level">Nível 3</span><p className="micro-label">Entropista</p><h3>A fome entre instantes</h3><ul><li><b>Magia Entrópica III</b> — aprende Aceleração, Drenar Espírito e Parar.</li><li><b>Benefício</b> — +5 PM e rituais de Entropismo.</li><li><b>Função</b> — economia de ações, controle e autossustentação de PM.</li></ul></article>
           <article><span className="level">Nível 1</span><p className="micro-label">Espiritualista</p><h3>A luz que preserva</h3><ul><li><b>Magia Espiritual I</b> — aprende Curar.</li><li><b>Benefício</b> — +5 PM e acesso a rituais.</li><li><b>Função</b> — cura confiável para Ryker e seus aliados.</li></ul></article>
         </div>
